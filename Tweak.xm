@@ -6,8 +6,9 @@ the generation of a class list and an automatic constructor.
 
 */
 
-#define Debugger
+// #define Debugger
 #define NLOG false
+#define DEBUG 0
 
 #import "MediaRemote.h"
 #import "sqlite3.h"

@@ -6,5 +6,5 @@ Description: Adds a heart indicator for songs you've "loved"
 Maintainer: Brayden Traas
 Author: Brayden Traas
 Section: Tweaks
-Version: 0.0.1-406+debug
-Installed-Size: 120
+Version: 0.0.1
+Installed-Size: 116

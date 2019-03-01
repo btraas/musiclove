@@ -39,7 +39,7 @@ NSString* getArtistName(NSObject* _orig) {
 }
 
 
-void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
+void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop) {
 
 
 	// NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"Resource" ofType:@"bundle"];
@@ -86,16 +86,24 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
 	} else {
 		// NSLog(@"Adding heart %@ (likeState=YES)", getTitle(_orig));
 
-    int paddingLeft = 0;
+
+    int _paddingLeft = 0;
+
 
     CGRect newFrame = [_orig convertRect:_orig.bounds toView:nil];
     if(newFrame.origin.x == 0) {
-      paddingLeft = 4;
+      _paddingLeft = 4;
     }
 
+    if(paddingLeft < 0) {
+      paddingLeft = _paddingLeft;
+    }
 
+		if(paddingTop < 0) {
+			paddingTop = 17.5;
+		}
 
-		CGRect frame = CGRectMake(paddingLeft, 17.5, 14, 14);
+		CGRect frame = CGRectMake(paddingLeft, paddingTop, 14, 14);
 
 		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
 
@@ -185,7 +193,7 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
 			 __block int isLiked = 0;
 			 NSString* title = getTitle(_orig);
 			 NSString* artist = getArtistName(_orig);
-			 int likeState = findLikedState(title, artist);
+			 int likeState = findLikedState(title, artist, nil);
 
 			 NSLog(@"Cell = %@/%@, state=%d",title,artist,likeState);
 
@@ -208,7 +216,7 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
 					 // [titles setObject:[NSNumber numberWithBool:NO] forKey:title];
 
 					 if(title == getTitle(_orig))
-					 		drawLike(_orig, title,  NO);
+					 		drawLike(_orig, title,  NO, -1, -1);
 
 				} else {
 					isLiked = 1;
@@ -216,18 +224,15 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
 				  // [titles setObject:[NSNumber numberWithBool:YES] forKey:title];
 					// // dispatch_sync(dispatch_get_main_queue(), ^(void){
 					if(title == getTitle(_orig))
-						drawLike(_orig, title, YES);
+						drawLike(_orig, title, YES, -1, -1);
 					// });
 				}
 					// dispatch_async(dispatch_get_main_queue(), ^(void){
 
 
-
-
 				NSLog(@"%@: is liked? %@", title, isLiked > 0 ? @"TRUE" : @"FALSE");
 
         showHideStar(_orig.contentView, likeState);
-
 
 
 		}
@@ -237,6 +242,16 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
 }
 %end
 
+
+NSString* vcArtist = @"";
+%hook MusicPageHeaderContentView
+
+-(void)layoutSubviews {
+  %orig;
+  vcArtist = [self title];
+}
+
+%end
 
 
 %hook MusicArtworkComponentImageView
@@ -289,11 +304,25 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
       if(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView") || isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
         NSString* title = getTitle(songCell);
         NSString* artist = getArtistName(songCell);
-        int likeState = findLikedState(title, artist);
-        NSLog(@"%@ likeState: %d", title, likeState);
+        int likeState = findLikedState(title, artist, nil);
+        NSLog(@"%@ likeState (from artist): %d", title, likeState);
 
         if(title == getTitle(songCell)) {
-          drawLike([self superview], title, (likeState == 2 ? YES : NO));
+          drawLike([self superview], title, (likeState == 2 ? YES : NO), -1, -1);
+          showHideStar([self superview], likeState);
+        }
+
+        // VerticalScrollStackScrollView is for the artist only. "getArtistName() will get the album name instead..."
+      } else if(isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView")) {
+        NSString* title = getTitle(songCell);
+        NSString* album = getArtistName(songCell); // maybe apple music has a bug? artistName literally stores the album name in the artist view controller...
+        int likeState = findLikedState(title, vcArtist, nil);
+        logProperties(songCell);
+        NSLog(@"%@/%@ likeState (from album): %d", title, album, likeState);
+
+        if(title == getTitle(songCell)) {
+          drawLike([self superview], title, (likeState == 2 ? YES : NO), 3, 7);
+
           showHideStar([self superview], likeState);
         }
       } else {
@@ -315,5 +344,6 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState) {
 
 %ctor {
     %init(MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"),
+          MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"),
           CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"));
 }

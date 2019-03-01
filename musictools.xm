@@ -69,13 +69,18 @@ int64_t getArtistPID(NSString* artist) {
 	return pid;
 }
 
-int findLikedState(NSString* title, NSString* artist) {
-		NSLog(@"findLikedState(%@, %@)", title, artist);
+/**
+ * album not working yet!
+*/
+int findLikedState(NSString* title, NSString* artist, NSString* album) {
+		NSLog(@"findLikedState(%@, %@, %@)", title, artist, album);
 		if(title == nil) {
 			NSLog(@"<error>: title is nil. Returning 0!");
 			return 0;
 		}
-		if(artist == nil || artist.length == 0) {
+		if(album != nil) {
+			NSLog(@"Using album: %@", album);
+		} else if(artist == nil || artist.length == 0) {
 			NSLog(@"Using album PID: %lld", albumArtistPID);
 		}
 
@@ -103,12 +108,49 @@ int findLikedState(NSString* title, NSString* artist) {
 
 						sqlite3_stmt *statement2;
 
-						if(artist != nil && artist.length > 0) {
-							NSString* likeStmt = @"SELECT liked_state, item_stats.item_pid, liked_state_changed "
-								"FROM item_stats "
-								"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid "
-								"INNER JOIN item ON item.item_pid = item_stats.item_pid "
-								"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid "
+						//* album not working yet!
+						if(album != nil) {
+							// NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed "
+							// 	"FROM item_stats "
+							// 	"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid "
+							// 	"INNER JOIN item ON item.item_pid = item_stats.item_pid "
+							// 	"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid "
+							// 	"INNER JOIN album_artist ON album_artist.album_artist = item_artist.item_artist "
+							// 	"INNER JOIN album ON album.album_artist_pid = album_artist.album_artist_pid "
+							// 	"WHERE item_extra.title = ? AND album.album = ?";
+								NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed \n"
+									"FROM item_stats \n"
+									"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
+									"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
+
+									"INNER JOIN album ON album.album_pid = item.album_pid \n"
+									"WHERE item_extra.title = ? AND album.album = ?";
+
+	            const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
+
+							NSLog(@"preparing statement: %@", likeStmt);
+	            if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
+								NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
+								sqlite3_close(db);
+								return 0;
+							}
+
+							if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
+								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+								sqlite3_close(db);
+								return 0;
+							}
+							if (sqlite3_bind_text(statement2, 2, [album UTF8String], -1, NULL) != SQLITE_OK) {
+								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+								sqlite3_close(db);
+								return 0;
+							}
+						} else if(artist != nil && artist.length > 0) {
+							NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed \n"
+								"FROM item_stats \n"
+								"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
+								"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
+								"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid \n"
 								"WHERE item_extra.title = ? AND item_artist.item_artist = ?";
 
 	            const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
@@ -132,10 +174,10 @@ int findLikedState(NSString* title, NSString* artist) {
 							}
 
 						} else {
-							NSString* likeStmt = [NSString stringWithFormat:@"SELECT liked_state, item_stats.item_pid, liked_state_changed "
-								"FROM item_stats "
-								"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid "
-								"INNER JOIN item ON item.item_pid = item_stats.item_pid "
+							NSString* likeStmt = [NSString stringWithFormat:@"SELECT liked_state, item_stats.item_pid, liked_state_changed \n"
+								"FROM item_stats \n"
+								"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
+								"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
 								"WHERE item_extra.title = ? AND item.item_artist_pid = %lld", albumArtistPID];
 
 	            const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";

@@ -8,7 +8,7 @@ the generation of a class list and an automatic constructor.
 
 // #define Debugger
 #define NLOG false
-#define DEBUG 0
+// #define DEBUG 0
 
 #import "sqlite3.h"
 #import <objc/runtime.h>
@@ -27,11 +27,6 @@ the generation of a class list and an automatic constructor.
 
 
 static NSObject* controller;
-// static NSMutableDictionary *titles = [[NSMutableDictionary alloc] init];
-// static NSMutableArray *heartViews = [[NSMutableArray alloc] init];
-//
-// static NSMutableDictionary *heartKeys = [[NSMutableDictionary alloc] init];
-
 
 
 
@@ -69,10 +64,6 @@ void drawLike(UICollectionViewCell* _orig, NSString* title, BOOL likeState) {
 	}
 
 
-
-
-	// dispatch_sync(dispatch_get_main_queue(), ^(void){
-
 	if(likeState == NO) {
 		NSLog(@"Clearing heart %@ (likeState=NO)", getTitle(_orig));
     // clear existing heart
@@ -97,25 +88,8 @@ void drawLike(UICollectionViewCell* _orig, NSString* title, BOOL likeState) {
 		// make x + width <= 20
 		CGRect frame = CGRectMake( (IDIOM == IPAD ? 0 : 3.5), 17.5, 14, 14);
 
-// background on iPhone
-		// if(IDIOM != IPAD) {
-		// 	CGRect backgroundFrame = CGRectMake( 6, 14, 10, 16);
-		// 	UIView *bgView = [[UIView alloc] initWithFrame:backgroundFrame];
-		// 	[bgView setBackgroundColor:[UIColor olor]];
-		// 	if(_orig != nil && _orig.contentView != nil && _orig.contentView.window != nil) {
-		// 		NSLog(@"adding heart bg");
-		//
-		// 		[_orig.contentView addSubview:bgView];
-		// 		[_orig.contentView bringSubviewToFront:bgView];
-		//
-		// 	}
-		// }
-
 		// CGRect frame = CGRectMake(_orig.contentView.frame.size.width - 70, 16, 16, 16);
 		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
-		// [heartViews addObject:newView];
-		// [heartKeys setObject:newView forKey:title];
-
 
 		if(newView != nil) {
 			// [newView setBackgroundColor:[UIColor whiteColor]];
@@ -189,17 +163,7 @@ void drawSongLike(UIView* _orig, NSString* title, BOOL likeState) {
       //paddingLeft = 10;
     }
 
-    // if([_orig nextResponder]) {
-    //   NSString* vcType = NSStringFromClass([[_orig nextResponder] class]);
-    //   if(vcType) {
-    //     // alert(@"VC: %@", vcType);
-    //     return;
-    //     if([vcType isEqualToString:@"Music.SongsViewController"]) {
-    //       paddingLeft = 10;
-    //     }
-    //   }
-    //
-    // }
+
 
 		CGRect frame = CGRectMake(paddingLeft, 17.5, 14, 14);
 
@@ -227,7 +191,7 @@ void drawSongLike(UIView* _orig, NSString* title, BOOL likeState) {
 %hook CompositeCollectionViewController
 
 	/**
-		hook the header creation load
+		hook the header creation load (for getting the artist on album VCs)
 
 	 */
   -(UICollectionReusableView *)collectionView:(UICollectionView*)cv viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
@@ -304,123 +268,36 @@ void drawSongLike(UIView* _orig, NSString* title, BOOL likeState) {
 
 				 if([NSStringFromClass([subview class]) isEqualToString:@"UIImageView"]) {
 					 NSLog(@"Removing subview: %@  %@", title, NSStringFromClass([subview class] ));
-
-					 	[subview removeFromSuperview];
-					 // if there is a view with this id already created
-					 // if([heartKeys objectForKey:title]) {
-					 //
-						//  // if the SongCell has a heartView, remove it!
-						//  if([heartViews containsObject:subview]) {
-						// 	 [subview removeFromSuperview];
-						//  }
-					 // }
-					 //
-						//  UIView* view = [heartKeys objectForKey:title];
-						//  [view removeFromSuperview];
-					 // }
-					 // if(subview.frame.origin.x <= 15 && subview != nil) {
-						//  // dispatch_async(dispatch_get_main_queue(), ^(void){
-						// 	 NSLog(@"     -> origin < 15. Removing now! (this is a previously added heart)");
-						// 	 if(subview != nil) {
-						// 		 // dispatch_sync(dispatch_get_main_queue(), ^(void){
-						// 			 [subview removeFromSuperview];
-						// 		 // });
-						// 	 }
-						//  // });
-					 // }
+				 	 [subview removeFromSuperview];
 				 }
 			 }
 
 
 
+				if(likeState != 2) {
+					 // [titles setObject:[NSNumber numberWithBool:NO] forKey:title];
 
-			  //NSLog(@"Starting background thread %@", [NSThread currentThread]);
+					 if(title == getTitle(_orig))
+					 		drawLike(_orig, title,  NO);
 
+				} else {
+					isLiked = 1;
 
-
-				// if([titles objectForKey:title]){
-				// 	BOOL storedLike = [[titles objectForKey:title] boolValue];
-				// 	NSLog(@"Stored like: %@", storedLike ? @"TRUE" : @"FALSE");
-				// }
-					//drawLike(_orig, storedLike);
-				//} else {
-					//drawLike(_orig, NO);
-					// dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-
-						// NSLog(@"Finding liked state");
-						// NSLog(@"Got like state: %d", likeState);
-
-						if(likeState != 2) {
-							 // [titles setObject:[NSNumber numberWithBool:NO] forKey:title];
-
-							 if(title == getTitle(_orig))
-							 		drawLike(_orig, title,  NO);
-
-						} else {
-							isLiked = 1;
-
-						  // [titles setObject:[NSNumber numberWithBool:YES] forKey:title];
-							// // dispatch_sync(dispatch_get_main_queue(), ^(void){
-							if(title == getTitle(_orig))
-								drawLike(_orig, title, YES);
-							// });
-						}
-							// dispatch_async(dispatch_get_main_queue(), ^(void){
-
-
-
-
-						NSLog(@"%@: is liked? %@", title, isLiked > 0 ? @"TRUE" : @"FALSE");
-
-            showHideStar(_orig.contentView, likeState);
-
-					    //Background Thread
-							// [NSThread sleepForTimeInterval:0f];
-					        //Run UI Updates
-
-							// for (UIView *subview in _orig.contentView.subviews){
-              //
-							// 	if([NSStringFromClass([subview class]) isEqualToString:@"_TtCV5Music4Text9StackView"] && [subview.subviews count] > 0){
-							// 		// NSLog(@"UITableViewCellcontentView:found a %@ with %lu subviews!!",
-							// 				// NSStringFromClass([subview class]), (unsigned long)[subview.subviews count]);
-              //
-							// 			NSLog(@"%@ star (1) (origin.x=%f)", (isLiked > 0 ? @"hiding":@"showing"), subview.frame.origin.x);
-              //
-              //
-							// 		for(UIView* textStackView in subview.subviews) {
-							// 			NSLog(@"star(1.5) origin.x: %f", textStackView.frame.origin.x);
-              //
-							// 			// star origin.x should be around 4.0
-							// 			if(textStackView != nil && subview.frame.origin.x <= 15) {
-							// 				// NSLog(@"     -> origin < 15. Hiding now!");
-							// 				//dispatch_async(dispatch_get_main_queue(), ^(void){
-							// 				NSLog(@"%@ star (2)", isLiked > 0 ? @"hiding":@"showing");
-							// 				// [textStackView removeFromSuperview];
-							// 				[textStackView setHidden:(isLiked==1)];
-              //
-							// 					// if(textStackView != nil && textStackView.window != nil) {
-							// 					// 	if(isLiked == 1) {
-							// 					// 		textStackView.hidden = YES;
-							// 					// 		[textStackView removeFromSuperview];
-							// 					// 	} else {
-							// 					// 		textStackView.hidden = NO;
-							// 					// 	}
-							// 					// }
-              //
-							// 				// });
-							// 			}
-							// 		}
-              //
-							// 		// UIView* child = subview.subviews[0];
-							// 		// NSLog(@"   -> Stackview child: %@", NSStringFromClass([child class]));
-							// 		// NSLog(@"     -> x = %f, width = %f", subview.frame.origin.x, child.frame.size.width);
-              //
-							// 		// break;
-							// 	}
-							// }
-
+				  // [titles setObject:[NSNumber numberWithBool:YES] forKey:title];
+					// // dispatch_sync(dispatch_get_main_queue(), ^(void){
+					if(title == getTitle(_orig))
+						drawLike(_orig, title, YES);
 					// });
-				//}
+				}
+					// dispatch_async(dispatch_get_main_queue(), ^(void){
+
+
+
+
+				NSLog(@"%@: is liked? %@", title, isLiked > 0 ? @"TRUE" : @"FALSE");
+
+        showHideStar(_orig.contentView, likeState);
+
 
 
 		}
@@ -430,38 +307,7 @@ void drawSongLike(UIView* _orig, NSString* title, BOOL likeState) {
 }
 %end
 
-%hook SongsViewController
-- (id)init {
-  NSLog(@"SongsViewController::init");
-  return %orig;
-}
-%end
-%hook MusicTintColorObservingView
-- (id)init {
-  NSLog(@"MusicTintColorObservingView::init");
-  return %orig;
-}
-%end
 
-
-%hook MusicSongCell
-- (id)init {
-  // NSLog(@"SongCell::init");
-  return %orig;
-}
--(UIColor *)backgroundColor {
-  // NSLog(@"SongCell::getBackgroundColor");
-  return %orig;
-}
-
--(void)setBackgroundColor:(UIColor *)color {
-   // NSLog(@"SongCell::setBackgroundColor");
-
-   // [self setHidden:YES];
-
-    return %orig(color);
-}
-%end
 
 %hook MusicArtworkComponentImageView
 
@@ -500,21 +346,23 @@ void drawSongLike(UIView* _orig, NSString* title, BOOL likeState) {
     if(songCell) {
       // logViewInfo(songCell);
       // logProperties(songCell);
-      NSString* title = getTitle(songCell);
-      NSString* artist = getArtistName(songCell);
-      int likeState = findLikedState(title, artist);
+
 
       UIScrollView* collectionView = ((UIScrollView *)closest(self, @"UICollectionView"));
       // artist -> all songs superview = Music.VerticalScrollStackScrollView
       // all songs superview = UIViewControllerWrapperView
       //logViewInfo([collectionView superview]);
 
-      NSLog(@"%@ likeState: %d", title, likeState);
       //if not changed
 
       // UIViewControllerWrapperView is iPad, _UIParallaxDimmingView is iPhone
-      if(isClass([[collectionView superview] superview], @"UIViewControllerWrapperView") || isClass([[collectionView superview] superview], @"_UIParallaxDimmingView")) {
-        if(songCell && title == getTitle(songCell)) {
+      if(songCell && (isClass([[collectionView superview] superview], @"UIViewControllerWrapperView") || isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
+        NSString* title = getTitle(songCell);
+        NSString* artist = getArtistName(songCell);
+        int likeState = findLikedState(title, artist);
+        NSLog(@"%@ likeState: %d", title, likeState);
+
+        if(title == getTitle(songCell)) {
           drawSongLike([self superview], title, (likeState == 2 ? YES : NO));
           showHideStar([self superview], likeState);
         }

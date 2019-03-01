@@ -40,90 +40,6 @@ NSString* getArtistName(NSObject* _orig) {
 }
 
 
-void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop) {
-
-
-	
-	NSString *imageString = [[NSBundle bundleWithPath:bundle] pathForResource:@"heart" ofType:@"png"];
-	
-	
-
-	if(imageString == nil) {
-		NSLog(@" image is nil");
-		return;
-	}
-	UIImage *heartImage = [UIImage imageWithContentsOfFile:imageString];
-	if(heartImage == nil) {
-		NSLog(@" heartImage is nil");
-
-		return;
-	}
-
-	
-	heartImage = [heartImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-	if(heartImage == nil) {
-		NSLog(@" heartImage is nil");
-		return;
-	}
-
-
-	if(likeState == NO) {
-		
-    
-		for(UIView* subview in _orig.subviews) {
-			if([NSStringFromClass([subview class]) isEqualToString:@"UIImageView"]) {
-				NSLog(@"subview origin.x: %f", subview.frame.origin.x);
-
-				if(subview.frame.origin.x <= 15 && subview != nil) {
-					
-						NSLog(@"     -> origin < 15. Removing now! (this is a previously added heart)");
-						if(subview) {
-							[subview removeFromSuperview];
-						}
-					
-				}
-			}
-		}
-	} else {
-		
-
-
-    int _paddingLeft = 0;
-
-
-    CGRect newFrame = [_orig convertRect:_orig.bounds toView:nil];
-    if(newFrame.origin.x == 0) {
-      _paddingLeft = 4;
-    }
-
-    if(paddingLeft < 0) {
-      paddingLeft = _paddingLeft;
-    }
-
-		if(paddingTop < 0) {
-			paddingTop = 17.5;
-		}
-
-		CGRect frame = CGRectMake(paddingLeft, paddingTop, 14, 14);
-
-		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
-
-		if(newView != nil) {
-			[newView setTintColor:[UIColor redColor]];
-			[newView setImage:heartImage];
-
-			if(_orig &&  _orig.window != nil) {
-				NSLog(@"adding heart");
-
-				[_orig addSubview:newView];
-				[_orig bringSubviewToFront:newView];
-
-			}
-
-		}
-	}
-
-}
 
 
 
@@ -148,10 +64,10 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class MusicPageHeaderContentView; @class CompositeCollectionViewController; @class MusicArtworkComponentImageView; 
-static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionReusableView * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionViewCell * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); static UICollectionViewCell * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); static void (*_logos_orig$_ungrouped$MusicPageHeaderContentView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$MusicPageHeaderContentView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static id (*_logos_orig$_ungrouped$MusicArtworkComponentImageView$initWithFrame$)(_LOGOS_SELF_TYPE_INIT id, SEL, CGRect) _LOGOS_RETURN_RETAINED; static id _logos_method$_ungrouped$MusicArtworkComponentImageView$initWithFrame$(_LOGOS_SELF_TYPE_INIT id, SEL, CGRect) _LOGOS_RETURN_RETAINED; static void (*_logos_orig$_ungrouped$MusicArtworkComponentImageView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$MusicArtworkComponentImageView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); 
+@class MusicAlbumCell; @class MusicPageHeaderContentView; @class MusicArtworkComponentImageView; @class CompositeCollectionViewController; 
+static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionReusableView * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionViewCell * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); static UICollectionViewCell * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); static void (*_logos_orig$_ungrouped$MusicPageHeaderContentView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$MusicPageHeaderContentView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static id (*_logos_orig$_ungrouped$MusicArtworkComponentImageView$initWithFrame$)(_LOGOS_SELF_TYPE_INIT id, SEL, CGRect) _LOGOS_RETURN_RETAINED; static id _logos_method$_ungrouped$MusicArtworkComponentImageView$initWithFrame$(_LOGOS_SELF_TYPE_INIT id, SEL, CGRect) _LOGOS_RETURN_RETAINED; static void (*_logos_orig$_ungrouped$MusicArtworkComponentImageView$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$MusicArtworkComponentImageView$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$MusicAlbumCell$layoutSubviews)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); static void _logos_method$_ungrouped$MusicAlbumCell$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL); 
 
-#line 129 "Main.xm"
+#line 45 "Main.xm"
 
 
 	
@@ -269,6 +185,7 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 
 
 
+
 NSString* vcArtist = @"";
 
 
@@ -368,8 +285,20 @@ static void _logos_method$_ungrouped$MusicArtworkComponentImageView$layoutSubvie
 
 
 
-static __attribute__((constructor)) void _logosLocalCtor_3b057305(int __unused argc, char __unused **argv, char __unused **envp) {
+static void _logos_method$_ungrouped$MusicAlbumCell$layoutSubviews(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
+	_logos_orig$_ungrouped$MusicAlbumCell$layoutSubviews(self, _cmd);
+	NSString* title = [self title];
+	NSString* artist = getProperty(self, @"artistName");
+	
+	NSLog(@"MusicAlbumCell title: %@ artist: %@", title, artist);
+}
 
 
-    {Class _logos_class$_ungrouped$CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"); MSHookMessageEx(_logos_class$_ungrouped$CompositeCollectionViewController, @selector(collectionView:viewForSupplementaryElementOfKind:atIndexPath:), (IMP)&_logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$, (IMP*)&_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$);MSHookMessageEx(_logos_class$_ungrouped$CompositeCollectionViewController, @selector(collectionView:cellForItemAtIndexPath:), (IMP)&_logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$, (IMP*)&_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$);Class _logos_class$_ungrouped$MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"); MSHookMessageEx(_logos_class$_ungrouped$MusicPageHeaderContentView, @selector(layoutSubviews), (IMP)&_logos_method$_ungrouped$MusicPageHeaderContentView$layoutSubviews, (IMP*)&_logos_orig$_ungrouped$MusicPageHeaderContentView$layoutSubviews);Class _logos_class$_ungrouped$MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"); MSHookMessageEx(_logos_class$_ungrouped$MusicArtworkComponentImageView, @selector(initWithFrame:), (IMP)&_logos_method$_ungrouped$MusicArtworkComponentImageView$initWithFrame$, (IMP*)&_logos_orig$_ungrouped$MusicArtworkComponentImageView$initWithFrame$);MSHookMessageEx(_logos_class$_ungrouped$MusicArtworkComponentImageView, @selector(layoutSubviews), (IMP)&_logos_method$_ungrouped$MusicArtworkComponentImageView$layoutSubviews, (IMP*)&_logos_orig$_ungrouped$MusicArtworkComponentImageView$layoutSubviews);}
+
+static __attribute__((constructor)) void _logosLocalCtor_60b1dd2a(int __unused argc, char __unused **argv, char __unused **envp) {
+	  
+
+
+
+    {Class _logos_class$_ungrouped$CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"); MSHookMessageEx(_logos_class$_ungrouped$CompositeCollectionViewController, @selector(collectionView:viewForSupplementaryElementOfKind:atIndexPath:), (IMP)&_logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$, (IMP*)&_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$);MSHookMessageEx(_logos_class$_ungrouped$CompositeCollectionViewController, @selector(collectionView:cellForItemAtIndexPath:), (IMP)&_logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$, (IMP*)&_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$);Class _logos_class$_ungrouped$MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"); MSHookMessageEx(_logos_class$_ungrouped$MusicPageHeaderContentView, @selector(layoutSubviews), (IMP)&_logos_method$_ungrouped$MusicPageHeaderContentView$layoutSubviews, (IMP*)&_logos_orig$_ungrouped$MusicPageHeaderContentView$layoutSubviews);Class _logos_class$_ungrouped$MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"); MSHookMessageEx(_logos_class$_ungrouped$MusicArtworkComponentImageView, @selector(initWithFrame:), (IMP)&_logos_method$_ungrouped$MusicArtworkComponentImageView$initWithFrame$, (IMP*)&_logos_orig$_ungrouped$MusicArtworkComponentImageView$initWithFrame$);MSHookMessageEx(_logos_class$_ungrouped$MusicArtworkComponentImageView, @selector(layoutSubviews), (IMP)&_logos_method$_ungrouped$MusicArtworkComponentImageView$layoutSubviews, (IMP*)&_logos_orig$_ungrouped$MusicArtworkComponentImageView$layoutSubviews);Class _logos_class$_ungrouped$MusicAlbumCell = objc_getClass("Music.AlbumCell"); MSHookMessageEx(_logos_class$_ungrouped$MusicAlbumCell, @selector(layoutSubviews), (IMP)&_logos_method$_ungrouped$MusicAlbumCell$layoutSubviews, (IMP*)&_logos_orig$_ungrouped$MusicAlbumCell$layoutSubviews);}
 }

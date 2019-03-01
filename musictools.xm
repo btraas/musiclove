@@ -273,3 +273,89 @@ void showHideStar(UIView* view, int likeState) {
 		}
 	}
 }
+
+
+void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop) {
+
+
+	// NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"Resource" ofType:@"bundle"];
+	NSString *imageString = [[NSBundle bundleWithPath:bundle] pathForResource:@"heart" ofType:@"png"];
+	// NSLog(@" found image: %@",  imageString);
+	// UIImage *heartImage = [UIImage imageNamed:@"heart.png" inBundle:[NSBundle bundleWithPath:bundle]];
+
+	if(imageString == nil) {
+		NSLog(@" image is nil");
+		return;
+	}
+	UIImage *heartImage = [UIImage imageWithContentsOfFile:imageString];
+	if(heartImage == nil) {
+		NSLog(@" heartImage is nil");
+
+		return;
+	}
+
+	// UIImage *heartImage = [UIImage imageWithContentsOfFile:[NSString stringWithFormat:@"%@/heart@2x.png", bundle]];
+	heartImage = [heartImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+	if(heartImage == nil) {
+		NSLog(@" heartImage is nil");
+		return;
+	}
+
+
+	if(likeState == NO) {
+		// NSLog(@"Clearing heart %@ (likeState=NO)", getTitle(_orig));
+    // clear existing heart
+		for(UIView* subview in _orig.subviews) {
+			if([NSStringFromClass([subview class]) isEqualToString:@"UIImageView"]) {
+				NSLog(@"subview origin.x: %f", subview.frame.origin.x);
+
+				if(subview.frame.origin.x <= 15 && subview != nil) {
+					// dispatch_async(dispatch_get_main_queue(), ^(void){
+						NSLog(@"     -> origin < 15. Removing now! (this is a previously added heart)");
+						if(subview) {
+							[subview removeFromSuperview];
+						}
+					// });
+				}
+			}
+		}
+	} else {
+		// NSLog(@"Adding heart %@ (likeState=YES)", getTitle(_orig));
+
+
+    int _paddingLeft = 0;
+
+
+    CGRect newFrame = [_orig convertRect:_orig.bounds toView:nil];
+    if(newFrame.origin.x == 0) {
+      _paddingLeft = 4;
+    }
+
+    if(paddingLeft < 0) {
+      paddingLeft = _paddingLeft;
+    }
+
+		if(paddingTop < 0) {
+			paddingTop = 17.5;
+		}
+
+		CGRect frame = CGRectMake(paddingLeft, paddingTop, 14, 14);
+
+		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
+
+		if(newView != nil) {
+			[newView setTintColor:[UIColor redColor]];
+			[newView setImage:heartImage];
+
+			if(_orig &&  _orig.window != nil) {
+				NSLog(@"adding heart");
+
+				[_orig addSubview:newView];
+				[_orig bringSubviewToFront:newView];
+
+			}
+
+		}
+	}
+
+}

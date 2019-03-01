@@ -1,4 +1,4 @@
-#line 1 "Tweak.xm"
+#line 1 "Main.xmi"
 
 
 
@@ -15,8 +15,6 @@
 #import "sqlite3.h"
 #import <objc/runtime.h>
 
-#include "common.xm" 
-#include "musictools.xm" 
 
 #define bundle @"/Library/Application Support/ca.btraas.musiclove.bundle"
 

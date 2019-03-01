@@ -7,12 +7,14 @@
 
 
 
-#define Debugger
+
 #define NLOG false
+#define DEBUG 1
 
 #import "MediaRemote.h"
 #import "sqlite3.h"
 #import <objc/runtime.h>
+#include "common.xm"
 
 
 
@@ -25,7 +27,6 @@
 
 #define IS_OBJECT(T) _Generic( (T), id: YES, default: NO)
 
-BOOL iconExists = YES;
 
 
 
@@ -49,75 +50,23 @@ static NSObject* controller;
 
 
 
-static const char *getPropertyType(objc_property_t property) {
-    const char *attributes = property_getAttributes(property);
-    char buffer[1 + strlen(attributes)];
-    strcpy(buffer, attributes);
-    char *state = buffer, *attribute;
-    while ((attribute = strsep(&state, ",")) != NULL) {
-        if (attribute[0] == 'T') {
-            if (strlen(attribute) <= 4) {
-                break;
-            }
-            return (const char *)[[NSData dataWithBytes:(attribute + 3) length:strlen(attribute) - 4] bytes];
-        }
-    }
-    return "@";
-}
-
-
-
-void log(NSString* message) {
-	
-	
-	NSLog(@"LOG: %@", message);
-	return; 
-
-}
-
-void nlog(NSString* message) {
-	if(NLOG) log(message);
-}
-
-void alert(NSString* title, NSString* message) {
-	NSLog(@"ALERT: %@ %@", title, message);
-
-	if(!title || !message) {
-		return;
-	}
-
-
-
-	log(@"Init alert");
-
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title
-	  message: message
-	  delegate:nil
-	  cancelButtonTitle: @"Close"
-	  otherButtonTitles:nil];
-
-	log(@"Showing");
-  [alert show];
-  [alert release];
-
-}
 
 int64_t getArtistPID(NSString* artist) {
-	NSString *filePath =  @"/var/mobile/Media/iTunes_Control/iTunes/MediaLibrary.sqlitedb"; 
-	
+	NSString *filePath =  @"/var/mobile/Media/iTunes_Control/iTunes/MediaLibrary.sqlitedb";
+
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 
 	int64_t pid = 0;
 
 	if([fileManager fileExistsAtPath:filePath]){
-		
-			
-			
+
+
+
 			const char *dbpath = [filePath UTF8String];
 			sqlite3 *db;
-			
+
 			if (sqlite3_open(dbpath, &db) == SQLITE_OK) {
-					
+
 
 					sqlite3_stmt *statement2;
 
@@ -125,9 +74,9 @@ int64_t getArtistPID(NSString* artist) {
 						"FROM item_artist "
 						"WHERE item_artist = ?";
 
-					const char *likeStmtStr = [likeStmt UTF8String]; 
+					const char *likeStmtStr = [likeStmt UTF8String];
 
-					
+
 					if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
 						NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
 						sqlite3_close(db);
@@ -147,14 +96,14 @@ int64_t getArtistPID(NSString* artist) {
 					int stepResult = sqlite3_step(statement2);
 					if (stepResult == SQLITE_ROW ) {
 							pid = sqlite3_column_int64(statement2, 0);
-							
-							
 
-							
+
+
+
 							sqlite3_finalize(statement2);
 							sqlite3_close(db);
 							return pid;
-							
+
 					} else {
 						NSLog(@"Failed to step item_stats query (result = %d)!", stepResult);
 					}
@@ -166,7 +115,7 @@ int64_t getArtistPID(NSString* artist) {
 			}
 	}else{
 		log(@"DB does not exist");
-			
+
 	}
 	return pid;
 }
@@ -181,30 +130,28 @@ int findLikedState(NSString* title, NSString* artist) {
 			NSLog(@"Using album PID: %lld", albumArtistPID);
 		}
 
-		if(!iconExists) {
-			return 0;
-		}
+	
 
 
-		
-		
 
-    
-    
-		
-    NSString *filePath =  @"/var/mobile/Media/iTunes_Control/iTunes/MediaLibrary.sqlitedb"; 
-    
+
+
+
+
+
+    NSString *filePath =  @"/var/mobile/Media/iTunes_Control/iTunes/MediaLibrary.sqlitedb";
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     if([fileManager fileExistsAtPath:filePath]){
-			
-				
-        
+
+
+
         const char *dbpath = [filePath UTF8String];
 				sqlite3 *db;
-				
+
         if (sqlite3_open(dbpath, &db) == SQLITE_OK) {
-						
+
 
 						sqlite3_stmt *statement2;
 
@@ -216,7 +163,7 @@ int findLikedState(NSString* title, NSString* artist) {
 								"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid "
 								"WHERE item_extra.title = ? AND item_artist.item_artist = ?";
 
-	            const char *likeStmtStr = [likeStmt UTF8String]; 
+	            const char *likeStmtStr = [likeStmt UTF8String];
 
 							NSLog(@"preparing statement: %@", likeStmt);
 	            if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
@@ -243,7 +190,7 @@ int findLikedState(NSString* title, NSString* artist) {
 								"INNER JOIN item ON item.item_pid = item_stats.item_pid "
 								"WHERE item_extra.title = ? AND item.item_artist_pid = %lld", albumArtistPID];
 
-	            const char *likeStmtStr = [likeStmt UTF8String]; 
+	            const char *likeStmtStr = [likeStmt UTF8String];
 
 							NSLog(@"preparing statement: %@!", likeStmt);
 	            if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
@@ -263,8 +210,8 @@ int findLikedState(NSString* title, NSString* artist) {
 						int stepResult = sqlite3_step(statement2);
             if (stepResult == SQLITE_ROW ) {
                 int likedState = sqlite3_column_int(statement2, 0);
-								
-								
+
+
 								NSString* state = @"default";
 								if(likedState == 2) {
 									state = @"liked";
@@ -272,11 +219,11 @@ int findLikedState(NSString* title, NSString* artist) {
 								if(likedState == 3) {
 									state = @"disliked";
 								}
-								
+
 								sqlite3_finalize(statement2);
 		            sqlite3_close(db);
 								return likedState;
-								
+
             } else {
 							NSLog(@"<Error> Failed to step item_stats query (result = %d)!", stepResult);
 						}
@@ -288,46 +235,12 @@ int findLikedState(NSString* title, NSString* artist) {
         }
     }else{
 			log(@"DB does not exist");
-        
+
     }
 		return 0;
 }
 
-NSString* getProperty(NSObject* _orig, NSString* key) {
-	unsigned int outCount, i;
-	objc_property_t *properties = class_copyPropertyList([_orig class], &outCount);
-	
 
-	for(i = 0; i < outCount; i++) {
-			
-
-			objc_property_t property = properties[i];
-			if(property == nil) {
-				continue;
-			}
-			const char *propName = property_getName(property);
-			if(propName) {
-					const char *propType = getPropertyType(property);
-					NSString *propertyName = [NSString stringWithCString:propName encoding:[NSString defaultCStringEncoding]];
-					NSString *propertyType = [NSString stringWithCString:propType encoding:[NSString defaultCStringEncoding]];
-					if(propertyName == nil || propertyType == nil){
-						continue;
-					}
-					nlog([NSString stringWithFormat:@"  -> %@: %@ = %@", propertyName, propertyType, [_orig valueForKey:propertyName]]);
-
-
-					if([propertyName isEqualToString:key]) {
-						free(properties);
-						return [_orig valueForKey:propertyName];
-					}
-			}
-	}
-	
-
-	free(properties);
-	return nil;
-	
-}
 
 NSString* getTitle(NSObject* _orig) {
 	return getProperty(_orig, @"title");
@@ -338,10 +251,10 @@ NSString* getArtistName(NSObject* _orig) {
 
 void drawLike(UICollectionViewCell* _orig, NSString* title, BOOL likeState) {
 
-	
+
 	NSString *imageString = [[NSBundle bundleWithPath:bundle] pathForResource:@"heart" ofType:@"png"];
-	
-	
+
+
 
 	if(imageString == nil) {
 		NSLog(@" image is nil");
@@ -354,7 +267,7 @@ void drawLike(UICollectionViewCell* _orig, NSString* title, BOOL likeState) {
 		return;
 	}
 
-	
+
 	heartImage = [heartImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 	if(heartImage == nil) {
 		NSLog(@" heartImage is nil");
@@ -364,50 +277,50 @@ void drawLike(UICollectionViewCell* _orig, NSString* title, BOOL likeState) {
 
 
 
-	
+
 
 	if(likeState == NO) {
 		NSLog(@"Clearing heart %@ (likeState=NO)", getTitle(_orig));
-    
+
 		for(UIView* subview in _orig.subviews) {
 			if([NSStringFromClass([subview class]) isEqualToString:@"UIImageView"]) {
 				NSLog(@"subview origin.x: %f", subview.frame.origin.x);
 
 				if(subview.frame.origin.x <= 15 && subview != nil) {
-					
+
 						NSLog(@"     -> origin < 15. Removing now! (this is a previously added heart)");
 						if(subview != nil) {
 							[subview removeFromSuperview];
 						}
-					
+
 				}
 			}
 		}
 	} else {
 		NSLog(@"Adding heart %@ (likeState=YES)", getTitle(_orig));
 
-		
-		
+
+
 		CGRect frame = CGRectMake( (IDIOM == IPAD ? 0 : 3.5), 17.5, 14, 14);
 
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
 		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
-		
-		
+
+
 
 
 		if(newView != nil) {
@@ -451,13 +364,13 @@ void drawLike(UICollectionViewCell* _orig, NSString* title, BOOL likeState) {
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class CompositeCollectionViewController; 
-static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionReusableView * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionViewCell * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); static UICollectionViewCell * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); 
+@class CompositeCollectionViewController;
+static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionReusableView * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, UICollectionView*, NSString *, NSIndexPath *); static UICollectionViewCell * (*_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$)(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *); static UICollectionViewCell * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST, SEL, id, NSIndexPath *);
 
-#line 432 "Tweak.xm"
+#line 348 "Tweak.xm"
 
 
-	
+
 
 
 
@@ -470,10 +383,10 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 
 			for (UIView *subview in _orig.subviews){
 				if(subview != nil && [NSStringFromClass([subview class]) isEqualToString:@"Music.ContainerDetailHeaderLockupView"])
-					
+
 					for(UIView *lockupSubview in subview.subviews) {
 						NSString* lsClass =  NSStringFromClass([lockupSubview class]);
-						
+
 						if(lsClass != nil && [lsClass isEqualToString:@"UIButton"]) {
 							UILabel* titleLabel = ((UIButton *)lockupSubview).titleLabel;
 							if(titleLabel != nil && [titleLabel isKindOfClass:[UILabel class]]) {
@@ -481,17 +394,17 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 
 								NSLog(@"");
 								NSLog(@"Setting album artist: %@", text);
-								
+
 
 								if([text isKindOfClass:[NSString class]]) {
 									albumArtistPID = getArtistPID(titleLabel.text);
 									NSLog(@"Album artist PID: %lld", albumArtistPID);
-									
-									controller = self;
-									
-									
 
-									
+									controller = self;
+
+
+
+
 								}
 
 							}
@@ -503,12 +416,12 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 		return _orig;
 	}
 
- 
+
 
 
 
 	static UICollectionViewCell * _logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$(_LOGOS_SELF_TYPE_NORMAL id _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id cv, NSIndexPath * indexPath) {
-		
+
 		UICollectionViewCell* _orig = _logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$(self, _cmd, cv, indexPath);
 		if(_orig == nil) {
 			return _orig;
@@ -527,9 +440,9 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 			 NSLog(@"Cell = %@/%@, state=%d",title,artist,likeState);
 
 
-			 
 
-			 
+
+
 			 for(UIView* subview in _orig.contentView.subviews) {
 				 NSLog(@"Checking subview:  %@ at origin.x: %f", NSStringFromClass([subview class]), subview.frame.origin.x );
 
@@ -537,52 +450,52 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 					 NSLog(@"Removing subview: %@  %@", title, NSStringFromClass([subview class] ));
 
 					 	[subview removeFromSuperview];
-					 
-					 
-					 
-						
-						
-						
-						
-					 
-					 
-						
-						
-					 
-					 
-						
-						
-						
-						
-						
-						
-						
-						
-					 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				 }
 			 }
 
 
 
 
-			  
 
 
 
-				
-				
-				
-				
-					
-				
-					
-					
 
-						
-						
+
+
+
+
+
+
+
+
+
+
+
 
 						if(likeState != 2) {
-							 
+
 
 							 if(title == getTitle(_orig))
 							 		drawLike(_orig, title,  NO);
@@ -590,13 +503,13 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 						} else {
 							isLiked = 1;
 
-						  
-							
+
+
 							if(title == getTitle(_orig))
 								drawLike(_orig, title, YES);
-							
+
 						}
-							
+
 
 
 
@@ -607,15 +520,15 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 						}
 
 
-					    
-							
-					        
+
+
+
 
 							for (UIView *subview in _orig.contentView.subviews){
 
 								if([NSStringFromClass([subview class]) isEqualToString:@"_TtCV5Music4Text9StackView"] && [subview.subviews count] > 0){
-									
-											
+
+
 
 										NSLog(@"%@ star (1) (origin.x=%f)", (isLiked > 0 ? @"hiding":@"showing"), subview.frame.origin.x);
 
@@ -623,37 +536,37 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 									for(UIView* textStackView in subview.subviews) {
 										NSLog(@"star(1.5) origin.x: %f", textStackView.frame.origin.x);
 
-										
+
 										if(textStackView != nil && subview.frame.origin.x <= 15) {
-											
-											
+
+
 											NSLog(@"%@ star (2)", isLiked > 0 ? @"hiding":@"showing");
-											
+
 											[textStackView setHidden:(isLiked==1)];
 
-												
-												
-												
-												
-												
-												
-												
-												
 
-											
+
+
+
+
+
+
+
+
+
 										}
 									}
 
-									
-									
-									
 
-									
+
+
+
+
 								}
 							}
 
-					
-				
+
+
 
 
 		}
@@ -665,10 +578,10 @@ static UICollectionReusableView * (*_logos_orig$_ungrouped$CompositeCollectionVi
 
 
 
-static __attribute__((constructor)) void _logosLocalCtor_0907cfcf(int __unused argc, char __unused **argv, char __unused **envp) {
-	
+static __attribute__((constructor)) void _logosLocalCtor_f456ea7b(int __unused argc, char __unused **argv, char __unused **envp) {
+
 
     {Class _logos_class$_ungrouped$CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"); MSHookMessageEx(_logos_class$_ungrouped$CompositeCollectionViewController, @selector(collectionView:viewForSupplementaryElementOfKind:atIndexPath:), (IMP)&_logos_method$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$, (IMP*)&_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$viewForSupplementaryElementOfKind$atIndexPath$);MSHookMessageEx(_logos_class$_ungrouped$CompositeCollectionViewController, @selector(collectionView:cellForItemAtIndexPath:), (IMP)&_logos_method$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$, (IMP*)&_logos_orig$_ungrouped$CompositeCollectionViewController$collectionView$cellForItemAtIndexPath$);}
-		
+
 
 }

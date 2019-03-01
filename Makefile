@@ -1,7 +1,7 @@
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = MusicLove
-MusicLove_FILES = Tweak.xm
+MusicLove_FILES = Main.xm
 MusicLove_FRAMEWORKS = MediaPlayer UIKit
 MusicLove_PrivateFrameworks = FuseUI MediaPlaybackCore MediaPlayerUI MediaRemote
 

@@ -8,18 +8,14 @@ the generation of a class list and an automatic constructor.
 
 // #define Debugger
 #define NLOG false
-#define DEBUG 1
+#define DEBUG 0
 
-#import "MediaRemote.h"
 #import "sqlite3.h"
 #import <objc/runtime.h>
 #import "UIKit/UIKit.h"
 
 
 #define bundle @"/Library/Application Support/ca.btraas.musiclove.bundle"
-
-// #include "PlaylistAndAlbum.xm" // hooks for playlist and album list
-#include "Songs.xm" // Hooks for songs list
 
 
 #include "common.xm" // functions like nlog() and getProperty()

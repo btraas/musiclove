@@ -1,3 +1,7 @@
+// #include "preftools.xm"
+
+#define APPLE_MUSIC_TINT_COLOR 0xFF2D55
+
 static int64_t albumArtistPID = 0;
 
 int64_t getArtistPID(NSString* artist) {
@@ -74,6 +78,10 @@ int64_t getArtistPID(NSString* artist) {
 */
 int findLikedState(NSString* title, NSString* artist, NSString* album) {
 		NSLog(@"findLikedState(%@, %@, %@)", title, artist, album);
+		if(!heartEnabled()) {
+			NSLog(@"<error>: like disabled: returning 0!");
+			return 0;
+		}
 		if(title == nil) {
 			NSLog(@"<error>: title is nil. Returning 0!");
 			return 0;
@@ -232,6 +240,9 @@ int findLikedState(NSString* title, NSString* artist, NSString* album) {
 
 
 void showHideStar(UIView* view, int likeState) {
+	NSLog(@"showHideStar (%@):", likeState == 2 ? @"HIDING" : @"SHOWING");
+	logViewInfo(view);
+	return;
 	for (UIView *subview in view.subviews){
 
 		if([NSStringFromClass([subview class]) isEqualToString:@"_TtCV5Music4Text9StackView"] && [subview.subviews count] > 0){
@@ -244,13 +255,19 @@ void showHideStar(UIView* view, int likeState) {
 			for(UIView* textStackView in subview.subviews) {
 				NSLog(@"star(1.5) origin.x: %f", textStackView.frame.origin.x);
 
+				// dispatch_async(dispatch_get_main_queue(), ^{
+				// 	[textStackView setHidden:(likeState==2)];
+				// });
+
 				// star origin.x should be around 4.0
-				if(textStackView != nil && subview.frame.origin.x <= 15) {
+				if(textStackView != nil && ((subview.frame.origin.x <= 15) )) {
 					// NSLog(@"     -> origin < 15. Hiding now!");
 					//dispatch_async(dispatch_get_main_queue(), ^(void){
 					NSLog(@"%@ star (2)", likeState == 2 ? @"hiding":@"showing");
 					// [textStackView removeFromSuperview];
-					[textStackView setHidden:(likeState==2)];
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[textStackView setHidden:(likeState == 2)];
+					});
 
 						// if(textStackView != nil && textStackView.window != nil) {
 						// 	if(isLiked == 1) {
@@ -274,14 +291,19 @@ void showHideStar(UIView* view, int likeState) {
 	}
 }
 
+void hideStar(UIView* view) {
+	//dispatch_async(dispatch_get_main_queue(), ^{
+		showHideStar(view, 2); // hacky...
+	//});
+}
 
-void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop) {
+void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop, BOOL solidBackground) {
 
 
 	// NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"Resource" ofType:@"bundle"];
-	NSString *imageString = [[NSBundle bundleWithPath:bundle] pathForResource:@"heart" ofType:@"png"];
+	NSString *imageString = [[NSBundle bundleWithPath:resourceBundle] pathForResource:@"heart" ofType:@"png"];
 	// NSLog(@" found image: %@",  imageString);
-	// UIImage *heartImage = [UIImage imageNamed:@"heart.png" inBundle:[NSBundle bundleWithPath:bundle]];
+	// UIImage *heartImage = [UIImage imageNamed:@"heart.png" inBundle:[NSBundle bundleWithPath:resourceBundle];
 
 	if(imageString == nil) {
 		NSLog(@" image is nil");
@@ -302,7 +324,7 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 	}
 
 
-	if(likeState == NO) {
+	// if(likeState == NO) {
 		// NSLog(@"Clearing heart %@ (likeState=NO)", getTitle(_orig));
     // clear existing heart
 		for(UIView* subview in _orig.subviews) {
@@ -319,7 +341,8 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 				}
 			}
 		}
-	} else {
+
+	// } else {
 		// NSLog(@"Adding heart %@ (likeState=YES)", getTitle(_orig));
 
 
@@ -342,10 +365,38 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 		CGRect frame = CGRectMake(paddingLeft, paddingTop, 14, 14);
 
 		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
+		UIColor* bgColor = darkEnabled() ? [UIColor blackColor] : [UIColor whiteColor];
+
 
 		if(newView != nil) {
-			[newView setTintColor:[UIColor redColor]];
+			if(likeState == YES) {
+				[newView setTintColor:UIColorFromRGB(APPLE_MUSIC_TINT_COLOR)];
+			} else {
+				[newView setTintColor:bgColor];
+			}
+			// [newView setTintColor:[UIColor redColor]];
 			[newView setImage:heartImage];
+
+			// if the star is enabled, it sometimes shows while the heart is showing.
+			// This sets a background color on the heart to overlay the star.
+			// for some reason I can't see the star until after our code runs (~1s on A10X / iOS 11.4). Forcing this option to be set...
+			// if(starEnabled()) {
+			if(solidBackground)
+				[newView setBackgroundColor:bgColor];
+			// }
+
+			if(likeState == NO && solidBackground == NO) {
+				[newView setTintColor:nil];
+				[newView setBackgroundColor:nil];
+				[newView setImage:nil];
+
+			}
+
+
+			if(starEnabled() && likeState == NO) {
+				NSLog(@"Star is enalbed, and this song (%@) is not liked! Not adding the heart subview (returning early)!", title);
+				return;
+			}
 
 			if(_orig &&  _orig.window != nil) {
 				NSLog(@"adding heart");
@@ -356,6 +407,6 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 			}
 
 		}
-	}
+//	}
 
 }

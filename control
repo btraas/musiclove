@@ -1,7 +1,7 @@
 Package: ca.btraas.musiclove
 Name: MusicLove
 Depends: mobilesubstrate
-Version: 0.0.2
+Version: 0.1.0
 Architecture: iphoneos-arm
 Description: Adds a heart indicator for songs you've "loved"
 Maintainer: Brayden Traas

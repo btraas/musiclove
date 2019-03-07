@@ -3,6 +3,14 @@
 
 #define IS_OBJECT(T) _Generic( (T), id: YES, default: NO)
 
+#define UIColorFromRGB(rgbValue) \
+[UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
+                green:((float)((rgbValue & 0x00FF00) >>  8))/255.0 \
+                 blue:((float)((rgbValue & 0x0000FF) >>  0))/255.0 \
+                alpha:1.0]
+
+#include "MusicLove.h"
+
 void log(NSString* message) {
 	// NSString *str = @"LowPowerCheck -- Brayden";
 	// printf("ALERTMSG: %s\n", [message UTF8String]);
@@ -164,6 +172,28 @@ UIView* closest(UIView* view, NSString* ofType) {
   } else {
     return nil;
   }
+
+}
+
+UIView* find(UIView* view, NSString* ofType) {
+	NSString* thisType = NSStringFromClass([view class]);
+	if([thisType isEqualToString:ofType]) {
+    return view;
+  }
+	for(UIView* subview in view.subviews) {
+    NSString* subviewClass = NSStringFromClass([subview class]);
+		if([subviewClass isEqualToString: ofType]) {
+			return subview;
+		}
+  }
+	for(UIView* subview in view.subviews) {
+		UIView* found = find(subview, ofType);
+    if(found != nil) {
+			return found;
+		}
+  }
+
+	return nil;
 
 }
 

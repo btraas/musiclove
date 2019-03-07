@@ -13,4 +13,7 @@ include $(THEOS)/makefiles/bundle.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 
 after-install::
-	install.exec "killall -9 Music" || echo "Music was not running." && printf "\nEnjoy MusicLove ~\n"
+	install.exec "killall -9 Music" || echo "Music was not running." && printf "\nEnjoy MusicLove ~\n" # && install.exec "killall -9 SpringBoard"
+
+SUBPROJECTS += musiclove
+include $(THEOS_MAKE_PATH)/aggregate.mk

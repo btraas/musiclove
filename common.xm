@@ -160,6 +160,7 @@ void logViewInfo(UIView* _orig) {
 
 /**
  Emulates jQuery's .closest() function
+ // go up the chain to find the closest recursive parent with this class
 */
 UIView* closest(UIView* view, NSString* ofType) {
   NSString* thisType = NSStringFromClass([view class]);
@@ -175,6 +176,24 @@ UIView* closest(UIView* view, NSString* ofType) {
 
 }
 
+UIColor* recursiveBackgroundColor(UIView* view) {
+	UIColor* thisColor = [view backgroundColor];
+
+	if(thisColor != nil) {
+		return thisColor;
+	}
+
+  if([view superview]) {
+    return recursiveBackgroundColor([view superview]);
+  } else {
+    return nil;
+  }
+}
+
+/**
+ Emulates jQuery's find() function
+ // go down the chain to find the first recursive child with this class
+*/
 UIView* find(UIView* view, NSString* ofType) {
 	NSString* thisType = NSStringFromClass([view class]);
 	if([thisType isEqualToString:ofType]) {

@@ -299,6 +299,7 @@ void hideStar(UIView* view) {
 
 void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop, BOOL solidBackground) {
 
+	// if(darkEnabled()) solidBackground = false;
 
 	// NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"Resource" ofType:@"bundle"];
 	NSString *imageString = [[NSBundle bundleWithPath:resourceBundle] pathForResource:@"heart" ofType:@"png"];
@@ -346,26 +347,33 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 		// NSLog(@"Adding heart %@ (likeState=YES)", getTitle(_orig));
 
 
-    int _paddingLeft = 0;
+    float _paddingLeft = 0;
 
 
     CGRect newFrame = [_orig convertRect:_orig.bounds toView:nil];
     if(newFrame.origin.x == 0) {
-      _paddingLeft = 4;
+      _paddingLeft = 4.5; // 5 or more makes the star poke out left (iPhone 6, 12.0)
     }
+
 
     if(paddingLeft < 0) {
       paddingLeft = _paddingLeft;
     }
 
 		if(paddingTop < 0) {
-			paddingTop = 17.5;
+			paddingTop = 15.5; // any less than this,
 		}
 
-		CGRect frame = CGRectMake(paddingLeft, paddingTop, 14, 14);
+		CGRect frame = CGRectMake(paddingLeft, paddingTop, 17, 17);
 
 		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
-		UIColor* bgColor = darkEnabled() ? [UIColor blackColor] : [UIColor whiteColor];
+		UIColor* rootColor = recursiveBackgroundColor(_orig);
+		CGColorRef colorRef = rootColor.CGColor;
+		NSString *colorString = [CIColor colorWithCGColor:colorRef].stringRepresentation;
+		NSLog(@"rootColorString = %@", colorString);
+
+		// March 7 / 2019: found a way to support the native background color with other tweaks.
+		UIColor* bgColor = rootColor; //darkEnabled() ? rootColor : [UIColor whiteColor];
 
 
 		if(newView != nil) {
@@ -381,17 +389,20 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 			// This sets a background color on the heart to overlay the star.
 			// for some reason I can't see the star until after our code runs (~1s on A10X / iOS 11.4). Forcing this option to be set...
 			// if(starEnabled()) {
-			if(solidBackground)
+			//if(solidBackground)
 				[newView setBackgroundColor:bgColor];
 			// }
 
 			if(likeState == NO && solidBackground == NO) {
 				[newView setTintColor:nil];
-				[newView setBackgroundColor:nil];
+				[newView setBackgroundColor:rootColor];
 				[newView setImage:nil];
 
 			}
 
+			if(solidBackground == NO) {
+				[newView setBackgroundColor:nil]; // important! This is for when drawing hearts over album art.
+			}
 
 			if(starEnabled() && likeState == NO) {
 				NSLog(@"Star is enalbed, and this song (%@) is not liked! Not adding the heart subview (returning early)!", title);

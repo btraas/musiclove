@@ -5,6 +5,8 @@ MusicLove_FILES = MLVRootListController.m
 MusicLove_INSTALL_PATH = /Library/PreferenceBundles
 MusicLove_FRAMEWORKS = UIKit
 MusicLove_PRIVATE_FRAMEWORKS = Preferences
+MusicLove_LIBRARIES = colorpicker
+
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

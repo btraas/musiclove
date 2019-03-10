@@ -5,7 +5,7 @@
 //  ©2019 Brayden Traas
 //
 
-#define kPrefsPlistPath 		@"/var/mobile/Library/Preferences/ca.btraas.musiclove.plist"
+#define kPrefsPlistPath @"/var/mobile/Library/Preferences/ca.btraas.musiclove.plist"
 
 #define kNoctisAppID 			CFSTR("com.laughingquoll.noctis")
 #define kNoctisEnabledKey 		CFSTR("LQDDarkModeEnabled")

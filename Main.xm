@@ -7,18 +7,17 @@ the generation of a class list and an automatic constructor.
 */
 
 // #define Debugger
-#define NLOG false
 // #define DEBUG 0
 
 #import "sqlite3.h"
-#import <objc/runtime.h>
+#include <objc/runtime.h>
 #import "UIKit/UIKit.h"
 #include "MusicLove.h"
 
 #define resourceBundle @"/Library/Application Support/ca.btraas.musiclove.bundle"
 
 
-#include "common.xm" // functions like nlog() and getProperty()
+#include "common.m" // functions like nlog() and getProperty()
 #include "preftools.xm"
 #include "musictools.xm" // DB functions like getArtistPID()
 
@@ -28,7 +27,7 @@ the generation of a class list and an automatic constructor.
 
 
 static NSObject* controller;
-
+UIColor* secondaryBackground = nil;
 
 
 
@@ -158,15 +157,16 @@ NSString* vcArtist = @"";
 		NSString* title = getTitle(songCell);
 		NSString* artist = getArtistName(songCell);
 		int likeState = findLikedState(title, artist, nil);
-		NSLog(@"");
-		logProperties(songCell);
+		// NSLog(@"");
+		// logProperties(songCell);
 		NSLog(@"%@ (MSC) likeState (from artist): %d", title, likeState);
 
 
 		NSString* newTitle = getTitle(songCell);
 		if([newTitle isEqualToString:title]) {
 
-			drawLike(self, title, (likeState == 2 ? YES : NO), -1, -1, YES);
+
+			drawLike(self, title, likeState, -1, -1, YES, secondaryBackground);
 			showHideStar(find(self, @"UITableViewCellContentView"), likeState);
 
 		} else {
@@ -183,7 +183,7 @@ NSString* vcArtist = @"";
 		NSLog(@"%@/%@ likeState (from album): %d", title, album, likeState);
 
 		if([title isEqualToString: getTitle(songCell)]) {
-			drawLike(self, title, (likeState == 2 ? YES : NO), 3, 7, NO);
+			drawLike(self, title, likeState, 3, 7, NO, secondaryBackground);
 
 			showHideStar(find(self, @"UITableViewCellContentView"), likeState);
 		}else {
@@ -207,10 +207,31 @@ NSString* vcArtist = @"";
 // }
 // %end
 
+%hook MusicNowPlayingCollectionViewSecondaryBackground
+-(void)init {
+	NSLog(@"");
+	NSLog(@"MNPCVSB: init");
+	NSLog(@"");
+}
+-(void)layoutSubviews {
+	secondaryBackground = recursiveBackgroundColor(self);
+	NSLog(@"");
+	if(secondaryBackground == nil) {
+		NSLog(@"MNPCVSB: got background: nil");
+	} else {
+		NSString *colorString = [CIColor colorWithCGColor:secondaryBackground.CGColor].stringRepresentation;
+		NSLog(@"MNPCVSB: got background: %@", colorString);
+	}
+
+	NSLog(@"");
+}
+%end
+
 %ctor {
 	  // Music.AlbumCell is also for playlists...
     %init(MusicAlbumCell = objc_getClass("Music.AlbumCell"),
 					MusicSongCell	 = objc_getClass("Music.SongCell"),
+					MusicNowPlayingCollectionViewSecondaryBackground = objc_getClass("Music.NowPlayingCollectionViewSecondaryBackground"),
 					MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"),
           MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"),
           CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"));

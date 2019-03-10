@@ -38,14 +38,14 @@ int64_t getArtistPID(NSString* artist) {
 					}
 
 					if (sqlite3_bind_text(statement2, 1, [artist UTF8String], -1, NULL) != SQLITE_OK) {
-						log([NSString stringWithFormat:@"Failed to bind item_extra: %s", sqlite3_errmsg(db)]);
+						NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
 						sqlite3_close(db);
 
 						return pid;
 					}
 
 
-					log(likeStmt);
+					NSLog(@"statement: %@", likeStmt);
 					int stepResult = sqlite3_step(statement2);
 					if (stepResult == SQLITE_ROW ) {
 							pid = sqlite3_column_int64(statement2, 0);
@@ -64,10 +64,10 @@ int64_t getArtistPID(NSString* artist) {
 					sqlite3_finalize(statement2);
 					sqlite3_close(db);
 			} else {
-					log(@"Failed to open db");
+					NSLog(@"Failed to open db");
 			}
 	}else{
-		log(@"DB does not exist");
+		NSLog(@"DB does not exist");
 			// NSLog(@"database is not exist.");
 	}
 	return pid;
@@ -198,7 +198,7 @@ int findLikedState(NSString* title, NSString* artist, NSString* album) {
 							}
 
 							if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
-								log([NSString stringWithFormat:@"Failed to bind item_extra: %s", sqlite3_errmsg(db)]);
+								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
 								sqlite3_close(db);
 								return 0;
 							}
@@ -229,10 +229,10 @@ int findLikedState(NSString* title, NSString* artist, NSString* album) {
 						sqlite3_finalize(statement2);
             sqlite3_close(db);
         } else {
-						log(@"Failed to open db");
+						NSLog(@"Failed to open db");
         }
     }else{
-			log(@"DB does not exist");
+			NSLog(@"DB does not exist");
         // NSLog(@"database is not exist.");
     }
 		return 0;
@@ -241,7 +241,7 @@ int findLikedState(NSString* title, NSString* artist, NSString* album) {
 
 void showHideStar(UIView* view, int likeState) {
 	NSLog(@"showHideStar (%@):", likeState == 2 ? @"HIDING" : @"SHOWING");
-	logViewInfo(view);
+	//logViewInfo(view);
 	return;
 	for (UIView *subview in view.subviews){
 
@@ -297,17 +297,23 @@ void hideStar(UIView* view) {
 	//});
 }
 
-void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, double paddingTop, BOOL solidBackground) {
+void drawLike(UIView* _orig, NSString* title, int likeState, int paddingLeft, double paddingTop, BOOL solidBackground, UIColor* forceBackgroundColor) {
+
+	if(likeState == 3 && !dislikeEnabled()) {
+		likeState = 0; // override
+	}
+	NSLog(@"drawLike: state=%d", likeState);
 
 	// if(darkEnabled()) solidBackground = false;
 
 	// NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"Resource" ofType:@"bundle"];
-	NSString *imageString = [[NSBundle bundleWithPath:resourceBundle] pathForResource:@"heart" ofType:@"png"];
+	NSString* icon = (likeState == 3 ? @"dislike" : @"heart");
+	NSString* imageString = [[NSBundle bundleWithPath:resourceBundle] pathForResource:icon ofType:@"png"];
 	// NSLog(@" found image: %@",  imageString);
 	// UIImage *heartImage = [UIImage imageNamed:@"heart.png" inBundle:[NSBundle bundleWithPath:resourceBundle];
 
 	if(imageString == nil) {
-		NSLog(@" image is nil");
+		NSLog(@" image(%@) is nil", icon);
 		return;
 	}
 	UIImage *heartImage = [UIImage imageWithContentsOfFile:imageString];
@@ -355,6 +361,11 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
       _paddingLeft = 4.5; // 5 or more makes the star poke out left (iPhone 6, 12.0)
     }
 
+		_paddingLeft = 2;
+		if(IDIOM == IPAD) {
+			_paddingLeft = 0;
+		}
+
 
     if(paddingLeft < 0) {
       paddingLeft = _paddingLeft;
@@ -364,21 +375,53 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 			paddingTop = 15.5; // any less than this,
 		}
 
-		CGRect frame = CGRectMake(paddingLeft, paddingTop, 17, 17);
 
+		float width = 17;
+		int height = 17;
+		if(likeState == 3) {
+			_paddingLeft = 2;
+			width = 14.5;
+			height = 16;
+		}
+		CGRect frame = CGRectMake(paddingLeft, paddingTop, width, height);
+
+		NSLog(@"getting color: ");
 		UIImageView *newView = [[UIImageView alloc] initWithFrame:frame];
-		UIColor* rootColor = recursiveBackgroundColor(_orig);
-		CGColorRef colorRef = rootColor.CGColor;
-		NSString *colorString = [CIColor colorWithCGColor:colorRef].stringRepresentation;
-		NSLog(@"rootColorString = %@", colorString);
+		NSLog(@"newView set");
+
+
+		UIColor* rootColor;
+
+		UIView* sBackground = find([_orig superview], @"Music.NowPlayingCollectionViewSecondaryBackground");
+		if(sBackground) {
+			rootColor = [sBackground backgroundColor];
+		} else {
+			rootColor = recursiveBackgroundColor(_orig);
+		}
+
+
+
+		// if(forceBackgroundColor) {
+		// 	rootColor = forceBackgroundColor;
+		// } else {
+		// 	rootColor = recursiveBackgroundColor(_orig);
+		// }
+		 // = forceBackgroundColor ? forceBackgroundColor : recursiveBackgroundColor(_orig);
+
+		NSLog(@"got color: %@", rootColor);
+		//
+		// NSString *colorString = [CIColor colorWithCGColor:rootColor.CGColor].stringRepresentation;
+		// NSLog(@"rootColorString = %@", colorString);
 
 		// March 7 / 2019: found a way to support the native background color with other tweaks.
 		UIColor* bgColor = rootColor; //darkEnabled() ? rootColor : [UIColor whiteColor];
 
 
 		if(newView != nil) {
-			if(likeState == YES) {
+			if(likeState == 2) {
 				[newView setTintColor:UIColorFromRGB(APPLE_MUSIC_TINT_COLOR)];
+			} else if(likeState == 3) {
+				[newView setTintColor:UIColorFromRGB(0x909090)]; // will want to change this. TODO add pro feature to change these colors.
 			} else {
 				[newView setTintColor:bgColor];
 			}
@@ -393,7 +436,7 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 				[newView setBackgroundColor:bgColor];
 			// }
 
-			if(likeState == NO && solidBackground == NO) {
+			if(likeState != 2 && likeState != 3 && solidBackground == NO) {
 				[newView setTintColor:nil];
 				[newView setBackgroundColor:rootColor];
 				[newView setImage:nil];
@@ -404,7 +447,7 @@ void drawLike(UIView* _orig, NSString* title, BOOL likeState, int paddingLeft, d
 				[newView setBackgroundColor:nil]; // important! This is for when drawing hearts over album art.
 			}
 
-			if(starEnabled() && likeState == NO) {
+			if(starEnabled() && !(likeState == 2 || likeState == 3)) {
 				NSLog(@"Star is enalbed, and this song (%@) is not liked! Not adding the heart subview (returning early)!", title);
 				return;
 			}

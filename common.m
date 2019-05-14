@@ -224,6 +224,72 @@ UIView* find(UIView* view, NSString* ofType) {
 
 }
 
+
+UIView* findWithOrigin(UIView* view, NSString* ofType, CGFloat x, CGFloat y) {
+	NSString* thisType = NSStringFromClass([view class]);
+	if([thisType isEqualToString:ofType]) {
+    // NSLog(@"   - checking %.2f,%.2f", view.frame.origin.x, view.frame.origin.y);
+    if(view.frame.origin.x == x && view.frame.origin.y == y) {
+      return view;
+    }
+  }
+	for(UIView* subview in view.subviews) {
+    NSString* subviewClass = NSStringFromClass([subview class]);
+		if([subviewClass isEqualToString: ofType]) {
+      // NSLog(@"   - checking %.2f,%.2f", subview.frame.origin.x, subview.frame.origin.y);
+      if(subview.frame.origin.x == x && subview.frame.origin.y == y) {
+        return subview;
+      }
+		}
+  }
+	for(UIView* subview in view.subviews) {
+		UIView* found = findWithOrigin(subview, ofType, x, y);
+    if(found != nil) {
+      return found;
+      // NSLog(@"   - checking %.2f,%.2f", found.frame.origin.x, subview.frame.origin.y);
+      // if(found.frame.origin.x == x && found.frame.origin.y == y) {
+      //   return found;
+      // }
+		}
+  }
+
+	return nil;
+
+}
+
+UIView* findWithSize(UIView* view, NSString* ofType, CGFloat width, CGFloat height) {
+	NSString* thisType = NSStringFromClass([view class]);
+	if([thisType isEqualToString:ofType]) {
+    // NSLog(@"   - checking %.2f,%.2f", view.frame.origin.x, view.frame.origin.y);
+    if(view.frame.size.width == width && view.frame.size.height == height) {
+      return view;
+    }
+  }
+	for(UIView* subview in view.subviews) {
+    NSString* subviewClass = NSStringFromClass([subview class]);
+		if([subviewClass isEqualToString: ofType]) {
+      // NSLog(@"   - checking %.2f,%.2f", subview.frame.origin.x, subview.frame.origin.y);
+      if(subview.frame.size.width == width && subview.frame.size.height == height) {
+        return subview;
+      }
+		}
+  }
+	for(UIView* subview in view.subviews) {
+		UIView* found = findWithSize(subview, ofType, width, height);
+    if(found != nil) {
+      return found;
+      // NSLog(@"   - checking %.2f,%.2f", found.frame.origin.x, subview.frame.origin.y);
+      // if(found.frame.origin.x == x && found.frame.origin.y == y) {
+      //   return found;
+      // }
+		}
+  }
+
+	return nil;
+
+}
+
+
 NSString* classNameOf(NSObject* obj) {
   return NSStringFromClass([obj class]);
 }

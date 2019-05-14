@@ -1,20 +1,13 @@
 #include "MusicLove.h"
+#define APPLE_MUSIC_TINT_COLOR_STRING @"#ff2d55"
 
-BOOL heartEnabled() {
-	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
-  return settings[@"show-song-heart"] ? [settings[@"show-song-heart"] boolValue] : YES;
-}
 
-BOOL starEnabled() {
-	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
-  BOOL enabled =  settings[@"show-song-popularity"] ? [settings[@"show-song-popularity"] boolValue] : YES;
-  // NSLog(@"starEnabled: %@", enabled ? @"YES" : @"NO");
-  return enabled;
-}
+
 BOOL darkEnabled() {
 	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
   return settings[@"support-dark-tweak"] ? [settings[@"support-dark-tweak"] boolValue] : NO;
 }
+
 
 BOOL shouldAutoOpenRestore() {
 	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
@@ -34,6 +27,9 @@ BOOL verifyProEmail(NSString* email) {
 	NSString* response = getDataFrom(url);
 	// NSLog(@"response: %@", response);
 
+	if(response == nil || [response isEqualToString:@""]) {
+		alert(@"MusicLove Pro verification failed", @"Are you connected to the internet? Please respring and try again.");
+	}
 	NSString *expected = sha1([NSString stringWithFormat:@"btraas-musiclove-%@-true", email]);
 	return expected && response && [expected isEqualToString:response];
 }
@@ -90,4 +86,53 @@ BOOL dislikeEnabled() {
 	}
 	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
   return settings[@"show-song-dislike"] ? [settings[@"show-song-dislike"] boolValue] : YES;
+}
+
+
+BOOL doubleTapLikeEnabled() {
+	if(!proEnabled()) {
+		return NO; // this feature requires proEnabled()
+	}
+	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
+  return settings[@"double-tap-like"] ? [settings[@"double-tap-like"] boolValue] : YES;
+}
+
+BOOL ratingEnabled() {
+	if(!proEnabled()) {
+		return NO;
+	}
+	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
+  return settings[@"show-rating"] ? [settings[@"show-rating"] boolValue] : NO;
+}
+
+NSString* getLikeColor() {
+	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
+	NSString* likeColor = [settings objectForKey:@"like-color"]; // assuming that the key has a value saved like #FFFFFF:0.75423
+	if(likeColor && proEnabled()) return likeColor;
+	return APPLE_MUSIC_TINT_COLOR_STRING; // else
+}
+NSString* getDislikeColor() {
+	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
+	NSString* dislikeColor = [settings objectForKey:@"dislike-color"]; // assuming that the key has a value saved like #FFFFFF:0.75423
+	if(dislikeColor && proEnabled()) return dislikeColor;
+	return @"#909090"; // else
+}
+
+
+
+BOOL heartEnabled() {
+	if(ratingEnabled()) {
+		return NO;
+	}
+	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
+  return settings[@"show-song-heart"] ? [settings[@"show-song-heart"] boolValue] : YES;
+}
+
+BOOL starEnabled() {
+	if(ratingEnabled()) {
+		return NO;
+	}
+	NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
+  BOOL enabled =  settings[@"show-song-popularity"] ? [settings[@"show-song-popularity"] boolValue] : YES;
+  return enabled;
 }

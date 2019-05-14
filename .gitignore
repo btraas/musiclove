@@ -3,3 +3,5 @@
 *.swo
 *.bak
 packages/*.deb
+.theos/obj
+.theos/_

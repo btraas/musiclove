@@ -70,6 +70,8 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>MusicLove Pro</string>
+			<key>footerText</key>
+			<string>Coming soon: liked lists, like filtering, and more!</string>
 		</dict>
 		<dict>
         <key>cell</key>
@@ -78,6 +80,8 @@
         <string>Get MusicLove Pro ($1.99)</string>
         <key>action</key>
         <string>registerPro</string>
+				<key>icon</key>
+				<string>paypal.png</string>
     </dict>
 		<dict>
 			<key>cell</key>
@@ -135,6 +139,38 @@
 			</dict>
 			<key>label</key>
 			<string>Dislike heart color</string>
+			<key>enabled</key>
+				<false/>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+				<string>PSSwitchCell</string>
+			<key>default</key>
+				<false/>
+			<key>defaults</key>
+				<string>ca.btraas.musiclove</string>
+			<key>key</key>
+				<string>show-rating</string>
+			<key>label</key>
+				<string>Show iTunes Rating</string>
+			<key>icon</key>
+				<string>5starIcon.png</string>
+			<key>enabled</key>
+				<false/>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+				<string>PSSwitchCell</string>
+			<key>default</key>
+				<false/>
+			<key>defaults</key>
+				<string>ca.btraas.musiclove</string>
+			<key>key</key>
+				<string>double-tap-like</string>
+			<key>label</key>
+				<string>Double-tap to like (beta)</string>
 			<key>enabled</key>
 				<false/>
 		</dict>

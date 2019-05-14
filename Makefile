@@ -1,4 +1,8 @@
-FINALPACKAGE=0
+#FINALPACKAGE=1
+DEBUG=1
+
+PACKAGE_VERSION=$(THEOS_PACKAGE_BASE_VERSION)
+
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = MusicLove
@@ -9,6 +13,8 @@ MusicLove_FRAMEWORKS = MediaPlayer UIKit
 BUNDLE_NAME = ca.btraas.musiclove
 ca.btraas.musiclove_INSTALL_PATH = /Library/Application Support/
 ca.btraas.musiclove_LIBRARIES = colorpicker
+ca.btraas.musiclove_PRIVATE_FRAMEWORKS = HomeSharing MusicLibrary
+
 
 # ca.btraas.musiclove_INSTALL_PATH = /Library/MobileSubstrate/DynamicLibraries
 

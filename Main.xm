@@ -20,6 +20,8 @@ the generation of a class list and an automatic constructor.
 #include "common.m" // functions like nlog() and getProperty()
 #include "preftools.xm"
 #include "musictools.xm" // DB functions like getArtistPID()
+// #include "tweakui.h"
+#include "tweakui.m" // functions like updateMusicLoveUI()
 
 // iTunes_Control/iTunes/MediaLibrary.sqlitedb -> item_stats.liked_state
 //  (2 = liked, 3 = disliked)
@@ -27,21 +29,133 @@ the generation of a class list and an automatic constructor.
 
 
 static NSObject* controller;
-UIColor* secondaryBackground = nil;
+
+NSMutableDictionary *cellMap;
 
 
 
-NSString* getTitle(NSObject* _orig) {
-	return getProperty(_orig, @"title");
+// void findSongCellTitle(UIView* songCell) {
+// 	UIScrollView* collectionView = ((UIScrollView *)closest(songCell, @"UICollectionView"));
+//vi
+// 	// UIViewControllerWrapperView is iPad, _UIParallaxDimmingView is iPhone
+// 	if(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView") || isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
+// 		return getTitle(songCell);
+// 		// VerticalScrollStackScrollView is for the artist only. "getArtistName() will get the album name instead..."
+// 	} else if(isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView") || isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
+// 		return getTitle(songCell);
+// 	}
+// 	return nil;
+// }
+
+
+%hook MusicSongsViewController
+
+
+	%new
+	-(NSMutableDictionary*)getCellMap {
+		return cellMap;
+	}
+
+
+	- (void)viewWillAppear:(BOOL)fp8 {
+	    %orig;
+			NSLog(@"MusicSongsViewController:: viewWillAppear");
+	}
+
+
+-(id)collectionView:(UICollectionView*)cv cellForItemAtIndexPath:(NSIndexPath*)indexPath {
+	NSLog(@"MusicSongsViewController:: cellForItemAtIndexPath");
+	MusicSongCell* cell = (MusicSongCell*)%orig(cv, indexPath);
+
+	if(!cellMap) {
+		NSInteger numberOfItems = [cv numberOfItemsInSection:indexPath.section];
+		cellMap = [[NSMutableDictionary alloc]initWithCapacity:numberOfItems]; // interesting, it seems this will expand automatically if needed
+	}
+
+	[cellMap setObject:cell forKey:[NSNumber numberWithInt:indexPath.row]];
+
+	updateMusicLoveUI((UIView*) cell);
+
+	return cell;
 }
-NSString* getArtistName(NSObject* _orig) {
-	return getProperty(_orig, @"artistName");
-}
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+	NSLog(@"DoubleTap: didSelectItem!");
+
+		// clear caches
+		[likeDict removeAllObjects];
+		[ratingDict removeAllObjects];
+
+		// updateMusicLoveUI(cell);
+		NSLog(@"DoubleTap: checking if we should play the song!!");
+
+		// do original action
+		if(playSong || !doubleTapLikeEnabled()) {
+			NSLog(@"DoubleTap: playSong = YES!");
+
+			// @try {
+			 	%orig;
+			// }
+			// @catch(NSException *exception) {
+			// 	NSLog(@"%@", exception.reason);
+			// }
+			playSong = NO;
+			return;
+		}
+
+		songCellTapped(self, collectionView, cellMap, indexPath);
+
+	}
+
+  %new
+	- (void)tapTimerFired:(NSTimer *)aTimer{
+    //timer fired, there was a single tap on indexPath.row = tappedRow
+		NSLog(@"DoubleTap: Timer fired!");
+
+    if(tapTimer != nil){
+        tapCount = 0;
+        tappedRow = -1;
+
+				[tapTimer invalidate];
+        tapTimer = nil;
+    }
+		if(cv && tapPath && cv != nil && tapPath != nil) {
+			playSong = YES; // force the next artificial tap to run as originally intended by Apple.
+
+			NSLog(@"DoubleTap: cv & tapPath not nil!");
+			@try {
+				NSLog(@"DoubleTap: Calling self collectionView:%@ didSelectItemAtIndexPath:%@", cv, tapPath);
+				[self collectionView:cv didSelectItemAtIndexPath:tapPath];
+			}
+			@catch(NSException *exception) {
+				NSLog(@"DoubleTap: Exception!");
+			}
 
 
+		}
+	}
+
+
+%end
 
 
 %hook CompositeCollectionViewController
+
+	%new
+	-(NSMutableDictionary*)getCellMap {
+		return cellMap;
+	}
+
+	// - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	//
+	// 	NSLog(@"CompositeCollectionViewController:: cellForRowAtIndexPath: %d", (int)indexPath.row);
+	// 	return %orig;
+	//
+	// }
+
+
+	// NSMutableDictionary *cellMap;
+
 
 	/**
 		hook the header creation load (for getting the artist on album VCs)
@@ -89,11 +203,96 @@ NSString* getArtistName(NSObject* _orig) {
 		return _orig;
 	}
 
+
+  // Actually returns a (swift) Music.SongCell
+	-(id)collectionView:(UICollectionView*)cv cellForItemAtIndexPath:(NSIndexPath*)indexPath {
+
+		NSLog(@"CompositeCollectionViewController:: cellForItemAtIndexPath");
+
+		MusicSongCell* cell = (MusicSongCell*)%orig(cv, indexPath);
+
+		if(!cellMap) {
+			NSInteger numberOfItems = [cv numberOfItemsInSection:indexPath.section];
+			cellMap = [[NSMutableDictionary alloc]initWithCapacity:numberOfItems]; // interesting, it seems this will expand automatically if needed
+		}
+
+		[cellMap setObject:cell forKey:[NSNumber numberWithInt:indexPath.row]];
+
+		// dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.05 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+		// 	updateMusicLoveUI(self);
+		// });
+
+		updateMusicLoveUI((UIView*) cell);
+
+		return cell;
+
+	}
+
+
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+	NSLog(@"DoubleTap: didSelectItem!");
+
+		// clear caches
+		[likeDict removeAllObjects];
+		[ratingDict removeAllObjects];
+
+		// updateMusicLoveUI(cell);
+		NSLog(@"DoubleTap: checking if we should play the song!!");
+
+		// do original action
+		if(playSong || !doubleTapLikeEnabled()) {
+			NSLog(@"DoubleTap: playSong = YES!");
+
+			// @try {
+			 	%orig;
+			// }
+			// @catch(NSException *exception) {
+			// 	NSLog(@"%@", exception.reason);
+			// }
+			playSong = NO;
+			return;
+		}
+
+		songCellTapped(self, collectionView, cellMap, indexPath);
+
+	}
+
+  %new
+	- (void)tapTimerFired:(NSTimer *)aTimer{
+    //timer fired, there was a single tap on indexPath.row = tappedRow
+		NSLog(@"DoubleTap: Timer fired!");
+
+    if(tapTimer != nil){
+        tapCount = 0;
+        tappedRow = -1;
+
+				[tapTimer invalidate];
+        tapTimer = nil;
+    }
+		if(cv && tapPath && cv != nil && tapPath != nil) {
+			playSong = YES; // force the next artificial tap to run as originally intended by Apple.
+
+			NSLog(@"DoubleTap: cv & tapPath not nil!");
+			@try {
+				NSLog(@"DoubleTap: Calling self collectionView:%@ didSelectItemAtIndexPath:%@", cv, tapPath);
+				[self collectionView:cv didSelectItemAtIndexPath:tapPath];
+			}
+			@catch(NSException *exception) {
+				NSLog(@"DoubleTap: Exception!");
+			}
+
+
+		}
+	}
+
+
 %end
 
 
+
+
 // this is for the Artist view controller. Works kinda like the album view controller.
-NSString* vcArtist = @"";
 %hook MusicPageHeaderContentView
 
 -(void)layoutSubviews {
@@ -104,10 +303,11 @@ NSString* vcArtist = @"";
 %end
 
 
+// works...
 %hook MusicArtworkComponentImageView
 
 -(id)initWithFrame:(CGRect)frame {
-  NSLog(@"Artwork::initWithFrame");
+  // NSLog(@"Artwork::initWithFrame");
   id _orig = %orig;
   // logProperties(_orig);
   // logSubviews(_orig);
@@ -133,73 +333,152 @@ NSString* vcArtist = @"";
 
 %end
 
-%hook MusicSongCell
-
--(void)layoutSubviews {
+%hook MusicCompositeCollectionView
+-(void)init {
 	%orig;
-	NSLog(@"MusicSongCell:: layoutSubviews!");
-	UIView* songCell = self;
-
-	UIScrollView* collectionView = ((UIScrollView *)closest(self, @"UICollectionView"));
-	// artist -> all songs superview = Music.VerticalScrollStackScrollView
-	// all songs superview = UIViewControllerWrapperView
-	//logViewInfo([collectionView superview]);
-
-	//if not changed
-
-	// UIViewControllerWrapperView is iPad, _UIParallaxDimmingView is iPhone
-	if(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView") || isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
-
-
-		// hideStar([self superview]); // until we know
-
-
-		NSString* title = getTitle(songCell);
-		NSString* artist = getArtistName(songCell);
-		int likeState = findLikedState(title, artist, nil);
-		// NSLog(@"");
-		// logProperties(songCell);
-		NSLog(@"%@ (MSC) likeState (from artist): %d", title, likeState);
-
-
-		NSString* newTitle = getTitle(songCell);
-		if([newTitle isEqualToString:title]) {
-
-
-			drawLike(self, title, likeState, -1, -1, YES, secondaryBackground);
-			showHideStar(find(self, @"UITableViewCellContentView"), likeState);
-
-		} else {
-			NSLog(@"%@ likeState (from artist): title changed! (from %@ to %@)", title, title, newTitle);
-
-		}
-
-		// VerticalScrollStackScrollView is for the artist only. "getArtistName() will get the album name instead..."
-	} else if(isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView") || isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
-		NSString* title = getTitle(songCell);
-		NSString* album = getArtistName(songCell); // maybe apple music has a bug? artistName literally stores the album name in the artist view controller...
-		int likeState = findLikedState(title, vcArtist, nil);
-		NSLog(@"");
-		NSLog(@"%@/%@ likeState (from album): %d", title, album, likeState);
-
-		if([title isEqualToString: getTitle(songCell)]) {
-			drawLike(self, title, likeState, 3, 7, NO, secondaryBackground);
-
-			showHideStar(find(self, @"UITableViewCellContentView"), likeState);
-		}else {
-			NSLog(@"Title has changed!! Skipping setting draw/star");
-		}
-	} else {
-		NSLog(@"(%@) superview (%@) superview (%@) superview (%@) is not a UIViewControllerWrapperView!!: ",
-				classNameOf(collectionView),
-				classNameOf([collectionView superview]),
-				classNameOf([[collectionView superview] superview]),
-				classNameOf([[[collectionView superview] superview] superview]));
-
-	}
 }
 
+-(void)layoutSubviews {
+	NSLog(@"Music.CompositeCollectionView:: layoutSubviews");
+	%orig;
+}
+
+// - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+//
+// 	NSLog(@"cellForRowAtIndexPath: %d", (int)indexPath.row);
+// 	return %orig;
+//
+//     // CustomTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: kIdentifier forIndexPath: indexPath];
+// 		//
+//     // // Do anything else here you would like.
+//     // // [cell someCustomMethod];
+// 		//
+//     // return cell;
+// }
+
 %end
+
+%hook UICollectionView
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	NSLog(@"UICollectionView:: cellForRowAtIndexPath: %d", (int)indexPath.row);
+	return %orig;
+
+    // CustomTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: kIdentifier forIndexPath: indexPath];
+		//
+    // // Do anything else here you would like.
+    // // [cell someCustomMethod];
+		//
+    // return cell;
+}
+%end
+
+
+%hook MusicSongCell
+
+// %property (nonatomic, assign) int currentLikeState;
+
+-(id)init {
+	NSLog(@"MusicSongCell:: init!");
+	return %orig;
+}
+
+-(void)loadView {
+	NSLog(@"MusicSongCell:: loadView!");
+	%orig;
+}
+
+-(void)viewDidLoad {
+	NSLog(@"MusicSongCell:: viewDidLoad!");
+	%orig;
+	// self.isPopular = false;
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+	NSLog(@"MusicSongCell:: viewWillAppear");
+	%orig;
+}
+
+-(void)prepareForReuse {
+	// NSLog(@"MusicSongCell:: prepareForReuse");
+	%orig;
+}
+
+-(void)layoutIfNeeded {
+	NSLog(@"MusicSongCell:: layoutIfNeeded");
+	%orig;
+}
+
+-(void)draw:(CGRect)rect {
+	NSLog(@"MusicSongCell:: draw");
+	%orig;
+}
+
+-(void)layoutSubviews {
+	// NSLog(@"MusicSongCell:: layoutSubviews!");
+	// NSLog(@"MusicSongCell:: layoutSubviews! %@",[NSThread callStackSymbols]);
+
+	%orig;
+	// updateMusicLoveUI(self);
+
+
+	NSString* title = getTitle(self);
+
+	if(!viewHasTag(self, title)) {
+		setViewTag(self, title);  // before delay
+		// dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5), dispatch_get_main_queue(), ^{
+			updateMusicLoveUI(self);
+			
+		// });
+  	// updateMusicLoveUI(self);
+  }
+
+
+	// Delay execution of my block for 1 second.
+	// dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0), dispatch_get_main_queue(), ^{
+	// 	updateMusicLoveUI(self);
+	// });
+
+
+	// NSTimeInterval timeSinceLastUpdate =
+	//dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.05 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+		// updateMusicLoveUI(self);
+	//});
+}
+
+- (void)longPress:(UILongPressGestureRecognizer*)gesture {
+		%orig(gesture);
+
+		updateMusicLoveUI(self);
+}
+
+
+%end
+//
+// %hook _TtCVV5Music4Text7Drawing4View
+// // %hook MusicTextDrawingView
+//
+// -(void)viewDidLoad {
+// 	NSLog(@"MusicTextDrawingView:: viewDidLoad!");
+// 	%orig;
+// }
+//
+//
+// - (void)viewDidLoad:(BOOL)animated {
+// 	%orig;
+//
+// 	UIView* view = (UIView*)self;
+// 	NSLog(@"MusicTextDrawingView::viewDidLoad");
+// 	if(view.frame.origin.x == 0 && view.frame.origin.y == -10.5) {
+// 		NSLog(@"MusicTextDrawingView::removing from superview!");
+// 		[view removeFromSuperview];
+// 	} else {
+// 		NSLog(@"MusicTextDrawingView::not removing from superview!");
+//
+// 	}
+// }
+//
+// %end
 
 // %hook MusicStar
 // -(id) init {
@@ -227,12 +506,126 @@ NSString* vcArtist = @"";
 }
 %end
 
+// HSCloudClient is "HomeService" which syncs itunes cloud / apple music properties.
+static HSCloudClient* cloudClient;
+%hook HSCloudClient
+- (HSCloudClient*)init {
+	cloudClient = %orig;
+	return cloudClient;
+}
+- (void)setItemProperties:(id)arg1 forSagaID:(unsigned long long)arg2 {
+	NSLog(@"");
+	NSLog(@" setItem properties for:%lld, %@ ", arg2, NSStringFromClass([arg1 class]));
+	NSLog(@" cloudClient: %@", cloudClient);
+	NSLog(@"");
+	%orig(arg1, arg2);
+
+}
+%end
+
+%hook MIPMediaItem
+	-(id) init {
+		NSLog(@" >> MIPMediaItem::init!");
+		return %orig;
+	}
+%end
+
+%hook UIButton
+	-(void)layoutSubviews {
+		%orig;
+		NSArray *array = [self.allTargets allObjects]; // theNSSet is replaced with your NSSet id
+		NSLog(@"allTargets: %@",array);
+
+		// NSLog(@"_targetActions %@",self._targetActions);
+	}
+%end
+
+%hook UICollectionViewDataSource
+-(id)collectionView:(UICollectionView*)collectionView cellForItemAtIndexPath:(NSIndexPath*)indexPath {
+	NSLog(@"UICollectionViewDataSource:: cellForRowAtIndexPath:");
+	return %orig;
+}
+%end
+
+%hook UICollectionViewDelegate
+-(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+	NSLog(@"UICollectionViewDelegate:: willDisplayCell");
+	%orig;
+}
+%end
+
+%hook UICollectionView
+-(id)init {
+	NSLog(@"UICollectionView:: init");
+	return %orig;
+}
+-(void)layoutSubviews {
+	// NSLog(@"UICollectionView:: layoutSubviews");
+	%orig;
+}
+
+-(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+	NSLog(@"UICollectionView:: willDisplayCell1");
+	%orig;
+}
+-(void)willDisplayCell:(UICollectionViewCell *)cell cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+	NSLog(@"UICollectionView:: willDisplayCell2");
+	%orig;
+}
+-(id)cellForItemAtIndexPath:(NSIndexPath*)indexPath {
+	NSLog(@"UICollectionView:: cellForRowAtIndexPath:");
+	return %orig;
+}
+%end
+
+%hook UIViewController
+- (void)viewWillAppear:(BOOL)fp8 {
+    %orig;
+		NSLog(@"UIViewController:: viewWillAppear");
+		if(!likeDictInit) {
+        likeDict = [NSMutableDictionary new];
+        likeDictInit = YES;
+    }
+		if(!ratingDictInit) {
+        ratingDict = [NSMutableDictionary new];
+        ratingDictInit = YES;
+    }
+
+		// clear caches
+		[likeDict removeAllObjects];
+    [ratingDict removeAllObjects];
+    // [dictX setValue:@YES forKey:@"TEST"];
+    // NSLog(dictX[@"TEST"]);
+}
+%end
+
+%hook MusicTintColorObservingView
+-(void)viewWillAppear:(BOOL)animated {
+	NSLog(@"MusicTintColorObservingView:: viewWillAppear");
+	%orig;
+	return;
+}
+%end
+
+%hook BrowseCollectionViewController
+-(void)viewDidLoad {
+	%orig;
+	NSLog(@"BrowseCollectionViewController:: viewDidLoad");
+}
+%end
+
 %ctor {
+	// MusicTextDrawingView = objc_getClass("_TtCVV5Music4Text7Drawing4View"),
+
+
 	  // Music.AlbumCell is also for playlists...
     %init(MusicAlbumCell = objc_getClass("Music.AlbumCell"),
 					MusicSongCell	 = objc_getClass("Music.SongCell"),
 					MusicNowPlayingCollectionViewSecondaryBackground = objc_getClass("Music.NowPlayingCollectionViewSecondaryBackground"),
 					MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"),
           MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"),
+					MusicSongsViewController = objc_getClass("Music.SongsViewController"),
+					MusicTintColorObservingView = objc_getClass("Music.TintColorObservingView"),
+					BrowseCollectionViewController = objc_getClass("_TtGC5Music30BrowseCollectionViewController"),
           CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"));
 }

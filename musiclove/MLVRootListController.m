@@ -90,7 +90,7 @@ void restorePurchaseAlert(MLVRootListController* vc) {
 					NSLog(@"Failed");
 					restoreResponseTitle = @"Failed!";
 					restoreResponseMessage = @"Could not find your purchase in our records. Please purchase or contact btraas@gmail.com";
-					setPref(@"paypal-email", @"");
+					// setPref(@"paypal-email", @"");
 				}
 				NSLog(@"pp-email was set.");
 

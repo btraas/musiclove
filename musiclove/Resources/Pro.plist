@@ -135,7 +135,7 @@
 			<string>Dislike heart color</string>
 		</dict>
 
-		<dict>
+		<!-- <dict>
 			<key>cell</key>
 				<string>PSSwitchCell</string>
 			<key>default</key>
@@ -148,7 +148,7 @@
 				<string>Double-tap to like (beta)</string>
 			<key>enabled</key>
 				<true/>
-		</dict>
+		</dict> -->
 
 		<dict>
 			<key>cell</key>

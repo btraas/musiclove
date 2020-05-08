@@ -1,0 +1,189 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXFileReference section */
+		54BF30702464F7410043A529 /* MediaLibrary.sqlitedb-wal */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MediaLibrary.sqlitedb-wal"; sourceTree = "<group>"; };
+		54BF30712464F7410043A529 /* common.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = common.m; sourceTree = "<group>"; };
+		54BF30722464F7410043A529 /* Settings */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Settings; sourceTree = "<group>"; };
+		54BF30732464F7410043A529 /* MediaLibrary.sqlitedb-shm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MediaLibrary.sqlitedb-shm"; sourceTree = "<group>"; };
+		54BF30742464F7410043A529 /* cmake-build-debug */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "cmake-build-debug"; sourceTree = "<group>"; };
+		54BF30752464F7410043A529 /* Main.xm */ = {isa = PBXFileReference; lastKnownFileType = text; path = Main.xm; sourceTree = "<group>"; };
+		54BF30762464F7410043A529 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		54BF30772464F7410043A529 /* .DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = .DS_Store; sourceTree = "<group>"; };
+		54BF30782464F7410043A529 /* MusicLove.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = MusicLove.plist; sourceTree = "<group>"; };
+		54BF30792464F7410043A529 /* .theos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .theos; sourceTree = "<group>"; };
+		54BF307A2464F7410043A529 /* musiclove */ = {isa = PBXFileReference; lastKnownFileType = folder; path = musiclove; sourceTree = "<group>"; };
+		54BF307B2464F7410043A529 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		54BF307C2464F7410043A529 /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; path = include; sourceTree = "<group>"; };
+		54BF307D2464F7410043A529 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
+		54BF307E2464F7410043A529 /* preftools.xm */ = {isa = PBXFileReference; lastKnownFileType = text; path = preftools.xm; sourceTree = "<group>"; };
+		54BF307F2464F7410043A529 /* tweakui.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tweakui.m; sourceTree = "<group>"; };
+		54BF30802464F7410043A529 /* heart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = heart.png; sourceTree = "<group>"; };
+		54BF30812464F7410043A529 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		54BF30822464F7410043A529 /* package-lock.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "package-lock.json"; sourceTree = "<group>"; };
+		54BF30832464F7410043A529 /* Support */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Support; sourceTree = "<group>"; };
+		54BF30842464F7410043A529 /* MusicLove.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MusicLove.h; sourceTree = "<group>"; };
+		54BF30852464F7410043A529 /* packages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = packages; sourceTree = "<group>"; };
+		54BF30862464F7410043A529 /* MediaLibrary.sqlitedb */ = {isa = PBXFileReference; lastKnownFileType = file; path = MediaLibrary.sqlitedb; sourceTree = "<group>"; };
+		54BF30872464F7410043A529 /* .git */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .git; sourceTree = "<group>"; };
+		54BF30882464F7410043A529 /* control */ = {isa = PBXFileReference; lastKnownFileType = text; path = control; sourceTree = "<group>"; };
+		54BF30892464F7410043A529 /* .idea */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .idea; sourceTree = "<group>"; };
+		54BF308A2464F7410043A529 /* musictools.xm */ = {isa = PBXFileReference; lastKnownFileType = text; path = musictools.xm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		54BF306A2464F7410043A529 = {
+			isa = PBXGroup;
+			children = (
+				54BF30702464F7410043A529 /* MediaLibrary.sqlitedb-wal */,
+				54BF30712464F7410043A529 /* common.m */,
+				54BF30722464F7410043A529 /* Settings */,
+				54BF30732464F7410043A529 /* MediaLibrary.sqlitedb-shm */,
+				54BF30742464F7410043A529 /* cmake-build-debug */,
+				54BF30752464F7410043A529 /* Main.xm */,
+				54BF30762464F7410043A529 /* CMakeLists.txt */,
+				54BF30772464F7410043A529 /* .DS_Store */,
+				54BF30782464F7410043A529 /* MusicLove.plist */,
+				54BF30792464F7410043A529 /* .theos */,
+				54BF307A2464F7410043A529 /* musiclove */,
+				54BF307B2464F7410043A529 /* Makefile */,
+				54BF307C2464F7410043A529 /* include */,
+				54BF307D2464F7410043A529 /* Resources */,
+				54BF307E2464F7410043A529 /* preftools.xm */,
+				54BF307F2464F7410043A529 /* tweakui.m */,
+				54BF30802464F7410043A529 /* heart.png */,
+				54BF30812464F7410043A529 /* .gitignore */,
+				54BF30822464F7410043A529 /* package-lock.json */,
+				54BF30832464F7410043A529 /* Support */,
+				54BF30842464F7410043A529 /* MusicLove.h */,
+				54BF30852464F7410043A529 /* packages */,
+				54BF30862464F7410043A529 /* MediaLibrary.sqlitedb */,
+				54BF30872464F7410043A529 /* .git */,
+				54BF30882464F7410043A529 /* control */,
+				54BF30892464F7410043A529 /* .idea */,
+				54BF308A2464F7410043A529 /* musictools.xm */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		54BF306F2464F7410043A529 /* musiclove */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 54BF308B2464F7410043A529 /* Build configuration list for PBXLegacyTarget "musiclove" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/brayden/jailbreak/musiclove;
+			dependencies = (
+			);
+			name = musiclove;
+			passBuildSettingsInEnvironment = 1;
+			productName = musiclove;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		54BF306B2464F7410043A529 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 54BF306E2464F7410043A529 /* Build configuration list for PBXProject "musiclove" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 54BF306A2464F7410043A529;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				54BF306F2464F7410043A529 /* musiclove */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		54BF306C2464F7410043A529 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		54BF306D2464F7410043A529 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		54BF308C2464F7410043A529 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = musiclove;
+			};
+			name = Debug;
+		};
+		54BF308D2464F7410043A529 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = musiclove;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		54BF306E2464F7410043A529 /* Build configuration list for PBXProject "musiclove" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54BF306C2464F7410043A529 /* Debug */,
+				54BF306D2464F7410043A529 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		54BF308B2464F7410043A529 /* Build configuration list for PBXLegacyTarget "musiclove" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54BF308C2464F7410043A529 /* Debug */,
+				54BF308D2464F7410043A529 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 54BF306B2464F7410043A529 /* Project object */;
+}

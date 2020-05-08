@@ -25,13 +25,24 @@ NSString* getArtistName(NSObject* _orig) {
 NSString* findSongCellArtist(UIView* songCell) {
 	UIScrollView* collectionView = ((UIScrollView *)closest(songCell, @"UICollectionView"));
 
-	// UIViewControllerWrapperView is iPad, _UIParallaxDimmingView is iPhone
-	if(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView")
-	|| isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
-		return getArtistName(songCell);
+	/** iOS < 13
+	 *
+//	// UIViewControllerWrapperView is iPad, _UIParallaxDimmingView is iPhone
+//	if(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView")
+//	|| isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
+//		return getArtistName(songCell);
+	 */
+
+	if(getArtistName(songCell)) {
+	    return getArtistName(songCell);
+
+//    // UIViewControllerWrapperView is iPad? (untested iOS 13), TintColorObservingView is iPhone
+//    elsif(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView")
+//                    || isClass([[collectionView superview] superview], @"MusicApplication.TintColorObservingView"))) {
+//        return getArtistName(songCell);
 
 		// VerticalScrollStackScrollView is for the artist only. "getArtistName() will get the album name instead..."
-	} else if(isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView")
+	} else if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView")
 	|| isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
 		return vcArtist;
 	}
@@ -56,7 +67,7 @@ void updateMusicLoveWithLikeState(UIView* songCell, NSString* title, int likeSta
 	UIScrollView* collectionView = ((UIScrollView *)closest(songCell, @"UICollectionView"));
 
 	// one is iPad, one is iPhone
-	if(isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView")
+	if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView")
 	|| isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
 		drawLike(songCell, title, likeState, 3, 7, NO, secondaryBackground);
 	} else {
@@ -78,7 +89,7 @@ void updateMusicLoveWithRating(UIView* songCell, NSString* title, int rating, in
 	}
 
 	// one is iPad, one is iPhone
-	if(isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView")
+	if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView")
 	|| isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
 
 		drawRating(songCell, title, rating, likeState, -1, paddingTop, NO, secondaryBackground);
@@ -107,15 +118,23 @@ void updateMusicLoveUI(UIView* songCell) {
 
 
 
-	NSLog(@"updateMusicLoveUI: alpha: %.2f", songCell.alpha);
+	NSLog(@"updateMusicLoveUI: alpha: %.2f (tmp)", songCell.alpha);
 
 	NSString* title = getTitle(songCell);
-	NSString* artist = findSongCellArtist(songCell);
-	if(artist == nil || [artist length] == 0 || artist == null || [artist length] < 2) {
+	NSString* artist = getArtistName(songCell);
+
+	NSLog(@"Found title: %@ and artist: %@", title, artist);
+
+	if(!artist) {
+	    artist = findSongCellArtist(songCell);
+	}
+
+	if(artist == nil || [artist length] == 0 || artist == NULL || [artist length] < 2) {
 		artist = vcArtist;
-	} 
+	}
 	NSString* combined = [NSString stringWithFormat:@"%@ _by_ %@", title, artist];
-	if(title == nil || artist == nil) {
+
+	if(title == nil || artist == nil || [artist length] == 0 || !artist) {
 		NSLog(@"title/artist empty!");
 		return;
 	}
@@ -143,6 +162,8 @@ void updateMusicLoveUI(UIView* songCell) {
 
 	NSLog(@"Properties of %@ SongCell:", title);
 	logProperties(songCell);
+	logViewInfo(songCell);
+
 
 	// if(songCell.alpha < 1.2) {
 		if(ratingEnabled()) {
@@ -152,7 +173,7 @@ void updateMusicLoveUI(UIView* songCell) {
 			// if(!ratings || ratings == nil || ![ratings.accessibilityLabel isEqualToString:title]) {
 				// int likeState = 0;
 
-				
+
 
 				int likeState;
 				if([likeDict objectForKey:combined] != nil) {
@@ -218,7 +239,7 @@ void updateMusicLoveUI(UIView* songCell) {
 			} else {
 				likeState = findLikedState(title, artist, nil);
 				[likeDict setValue:[NSNumber numberWithInt:likeState] forKey:combined];
-				NSLog(@"Loaded %@ from disk (likeState=%d)!", combined, likeState);
+				NSLog(@"Loaded %@ from disk (likeState=%d) (no rating)!", combined, likeState);
 			}
 
 			if(like && likeState == 2) {

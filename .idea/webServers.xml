@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9471275a-badf-4a36-85e0-98ab73145af9" name="iPhone 6S">
+        <fileTransfer rootFolder="/var/root/buildserver/" accessType="SFTP" host="192.168.0.34" port="22" sshConfigId="4252f123-014b-4de9-8c43-fcaff1350c52" sshConfig="root@192.168.0.34:22:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -15,7 +15,7 @@ UIColor* colorFromHexString(NSString* hexString) {
     [scanner scanHexInt:&rgbValue];
     return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
 }
-
+// "SELECT item_stats.liked_state FROM item JOIN item_stats USING (item_pid) WHERE item.ROWID = ?" // ML3Track
 int64_t getArtistPID(NSString* artist) {
 	NSString *filePath =  @"/var/mobile/Media/iTunes_Control/iTunes/MediaLibrary.sqlitedb"; //[documentsDirectory stringByAppendingPathComponent:@"Questiondata.db"];
 	// NSLog(@"filePath,%@",filePath);
@@ -812,7 +812,7 @@ void drawLike(UIView* _orig, NSString* title, int likeState, double paddingLeft,
 
 		UIColor* rootColor;
 
-		UIView* sBackground = find([_orig superview], @"Music.NowPlayingCollectionViewSecondaryBackground");
+		UIView* sBackground = find([_orig superview], @"MusicApplication.NowPlayingCollectionViewSecondaryBackground");
 		if(sBackground) {
 			rootColor = [sBackground backgroundColor];
 		} else {
@@ -1021,7 +1021,7 @@ void drawRating(UIView* _orig, NSString* title, int rating, int likeState, doubl
 
 		UIColor* rootColor;
 
-		UIView* sBackground = find([_orig superview], @"Music.NowPlayingCollectionViewSecondaryBackground");
+		UIView* sBackground = find([_orig superview], @"MusicApplication.NowPlayingCollectionViewSecondaryBackground");
 		if(sBackground) {
 			rootColor = [sBackground backgroundColor];
 		} else {

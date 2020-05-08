@@ -5,3 +5,4 @@
 packages/*.deb
 .theos/obj
 .theos/_
+*.sqlitedb

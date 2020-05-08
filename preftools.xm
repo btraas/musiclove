@@ -41,7 +41,7 @@ BOOL proEnabled() {
 	// NSDictionary *settings = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPlistPath];
   // return settings[@"pro-enabled"] ? [settings[@"pro-enabled"] boolValue] : NO;
 	if(_proLoaded) {
-		NSLog(@" -Pro status already loaded. returning %@", (_proEnabled ? @"YES" : @"NO"));
+		//NSLog(@" -Pro status already loaded. returning %@", (_proEnabled ? @"YES" : @"NO"));
 		return _proEnabled;
 	}
 

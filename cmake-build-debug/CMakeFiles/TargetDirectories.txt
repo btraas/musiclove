@@ -1,0 +1,3 @@
+/Users/brayden/jailbreak/musiclove/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/brayden/jailbreak/musiclove/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/brayden/jailbreak/musiclove/cmake-build-debug/CMakeFiles/musiclove.dir

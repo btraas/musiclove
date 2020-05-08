@@ -1,6 +1,8 @@
 #import "UIKit/UIKit.h"
 
 NSString* vcArtist = @"";
+NSString* vcAlbum = @"";
+
 UIColor* secondaryBackground = nil;
 
 
@@ -109,6 +111,9 @@ void updateMusicLoveUI(UIView* songCell) {
 
 	NSString* title = getTitle(songCell);
 	NSString* artist = findSongCellArtist(songCell);
+	if(artist == nil || [artist length] == 0 || artist == null || [artist length] < 2) {
+		artist = vcArtist;
+	} 
 	NSString* combined = [NSString stringWithFormat:@"%@ _by_ %@", title, artist];
 	if(title == nil || artist == nil) {
 		NSLog(@"title/artist empty!");
@@ -136,6 +141,8 @@ void updateMusicLoveUI(UIView* songCell) {
 	}
 
 
+	NSLog(@"Properties of %@ SongCell:", title);
+	logProperties(songCell);
 
 	// if(songCell.alpha < 1.2) {
 		if(ratingEnabled()) {
@@ -144,6 +151,8 @@ void updateMusicLoveUI(UIView* songCell) {
 
 			// if(!ratings || ratings == nil || ![ratings.accessibilityLabel isEqualToString:title]) {
 				// int likeState = 0;
+
+				
 
 				int likeState;
 				if([likeDict objectForKey:combined] != nil) {

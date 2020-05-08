@@ -302,6 +302,39 @@ NSMutableDictionary *cellMap;
 
 %end
 
+%hook MusicContainerDetailHeaderLockupView
+
+-(void)layoutSubviews {
+	%orig;
+
+	//vcAlbum = getProperty(self, @"titleText");
+	//NSLog(@"MusicContainerDetailHeaderLockupView properties:");
+	//logProperties(self);
+	//NSLog(@"MusicContainerDetailHeaderLockupView subviews:");
+	//logSubviews(self);
+
+	UIButton* artistTitleButton;
+	
+	if(IDIOM == IPAD) {
+		artistTitleButton = (UIButton*)findWithOrigin(self, @"UIButton", -66,35);
+	} else {
+		artistTitleButton = (UIButton*)findWithOrigin(self, @"UIButton", 107.5, 13.5);
+	}
+
+	if(artistTitleButton != nil) {
+		vcArtist = [artistTitleButton valueForKey:@"currentTitle"];
+		NSLog(@"MusicContainerDetailHeaderLockupView loaded artist: %@", vcArtist);
+		// vcArtist = getProperty(artistTitleButton, @"currentTitle");
+		// NSLog(@"MusicContainerDetailHeaderLockupView UIButton properties:");
+		// logProperties(artistTitleButton);
+	}
+
+	
+}
+
+
+%end
+
 
 // works...
 %hook MusicArtworkComponentImageView
@@ -428,7 +461,7 @@ NSMutableDictionary *cellMap;
 		setViewTag(self, title);  // before delay
 		// dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5), dispatch_get_main_queue(), ^{
 			updateMusicLoveUI(self);
-			
+
 		// });
   	// updateMusicLoveUI(self);
   }
@@ -573,7 +606,7 @@ static HSCloudClient* cloudClient;
 	%orig;
 }
 -(id)cellForItemAtIndexPath:(NSIndexPath*)indexPath {
-	NSLog(@"UICollectionView:: cellForRowAtIndexPath:");
+	NSLog(@"Main.xm[576] UICollectionView:: cellForRowAtIndexPath:");
 	return %orig;
 }
 %end
@@ -617,15 +650,22 @@ static HSCloudClient* cloudClient;
 %ctor {
 	// MusicTextDrawingView = objc_getClass("_TtCVV5Music4Text7Drawing4View"),
 
+		// Music.ContainerDetailHeaderLockupView.titleText (on album) = Album name
+		// Music.ContainerDetailHeaderLockupView --> UIButton.currentTitle (on album) = Artist name
+
+
 
 	  // Music.AlbumCell is also for playlists...
+	// don't have a space after %init(
     %init(MusicAlbumCell = objc_getClass("Music.AlbumCell"),
-					MusicSongCell	 = objc_getClass("Music.SongCell"),
-					MusicNowPlayingCollectionViewSecondaryBackground = objc_getClass("Music.NowPlayingCollectionViewSecondaryBackground"),
-					MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"),
-          MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"),
-					MusicSongsViewController = objc_getClass("Music.SongsViewController"),
-					MusicTintColorObservingView = objc_getClass("Music.TintColorObservingView"),
-					BrowseCollectionViewController = objc_getClass("_TtGC5Music30BrowseCollectionViewController"),
-          CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController"));
+			MusicSongCell	 = objc_getClass("Music.SongCell"),
+			MusicNowPlayingCollectionViewSecondaryBackground = objc_getClass("Music.NowPlayingCollectionViewSecondaryBackground"),
+			MusicArtworkComponentImageView = objc_getClass("Music.ArtworkComponentImageView"),
+          	MusicPageHeaderContentView = objc_getClass("Music.PageHeaderContentView"),
+			MusicContainerDetailHeaderLockupView = objc_getClass("Music.ContainerDetailHeaderLockupView"),
+			MusicSongsViewController = objc_getClass("Music.SongsViewController"),
+			MusicTintColorObservingView = objc_getClass("Music.TintColorObservingView"),
+			BrowseCollectionViewController = objc_getClass("_TtGC5Music30BrowseCollectionViewController"),
+          	CompositeCollectionViewController = objc_getClass("Music.CompositeCollectionViewController")
+	);
 }

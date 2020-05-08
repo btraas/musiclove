@@ -122,124 +122,124 @@ int findLikedStateRaw(NSString* title, NSString* artist, NSString* album) {
         if (sqlite3_open(dbpath, &db) == SQLITE_OK) {
 						// NSLog(@"DB opened!");
 
-						sqlite3_stmt *statement2;
+			sqlite3_stmt *statement2;
 
-						//* album not working yet!
-						if(album != nil) {
-							// NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed "
-							// 	"FROM item_stats "
-							// 	"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid "
-							// 	"INNER JOIN item ON item.item_pid = item_stats.item_pid "
-							// 	"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid "
-							// 	"INNER JOIN album_artist ON album_artist.album_artist = item_artist.item_artist "
-							// 	"INNER JOIN album ON album.album_artist_pid = album_artist.album_artist_pid "
-							// 	"WHERE item_extra.title = ? AND album.album = ?";
-								NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed \n"
-									"FROM item_stats \n"
-									"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
-									"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
+			//* album not working yet!
+			if(album != nil) {
+				// NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed "
+				// 	"FROM item_stats "
+				// 	"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid "
+				// 	"INNER JOIN item ON item.item_pid = item_stats.item_pid "
+				// 	"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid "
+				// 	"INNER JOIN album_artist ON album_artist.album_artist = item_artist.item_artist "
+				// 	"INNER JOIN album ON album.album_artist_pid = album_artist.album_artist_pid "
+				// 	"WHERE item_extra.title = ? AND album.album = ?";
+					NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed \n"
+						"FROM item_stats \n"
+						"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
+						"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
 
-									"INNER JOIN album ON album.album_pid = item.album_pid \n"
-									"WHERE item_extra.title = ? AND album.album = ?";
-
-	            const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
-
-							NSLog(@"preparing statement: %@", likeStmt);
-	            if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
-
-							if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
-							if (sqlite3_bind_text(statement2, 2, [album UTF8String], -1, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
-						} else if(artist != nil && artist.length > 0) {
-							NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed \n"
-								"FROM item_stats \n"
-								"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
-								"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
-								"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid \n"
-								"WHERE item_extra.title = ? AND item_artist.item_artist = ?";
+						"INNER JOIN album ON album.album_pid = item.album_pid \n"
+						"WHERE item_extra.title = ? AND album.album = ?";
 
 	            const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
 
-							NSLog(@"preparing statement: %@", likeStmt);
+				NSLog(@"preparing statement: %@", likeStmt);
 	            if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
+					NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
 
-							if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
-							if (sqlite3_bind_text(statement2, 2, [artist UTF8String], -1, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
+				if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
+					NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
+				if (sqlite3_bind_text(statement2, 2, [album UTF8String], -1, NULL) != SQLITE_OK) {
+					NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
+			} else if(artist != nil && artist.length > 0) {
+				NSString* likeStmt = @"SELECT item_stats.liked_state, item_stats.item_pid, item_stats.liked_state_changed \n"
+					"FROM item_stats \n"
+					"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
+					"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
+					"INNER JOIN item_artist ON item_artist.item_artist_pid = item.item_artist_pid \n"
+					"WHERE item_extra.title = ? AND item_artist.item_artist = ?";
 
-						} else {
-							NSString* likeStmt = [NSString stringWithFormat:@"SELECT liked_state, item_stats.item_pid, liked_state_changed \n"
-								"FROM item_stats \n"
-								"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
-								"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
-								"WHERE item_extra.title = ? AND item.item_artist_pid = %lld", albumArtistPID];
+				const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
 
-	            const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
-
-							NSLog(@"preparing statement: %@!", likeStmt);
+				NSLog(@"preparing statement: %@", likeStmt);
 	            if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
+					NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
 
-							if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
-								NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
-								sqlite3_close(db);
-								return 0;
-							}
+				if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
+					NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
+				if (sqlite3_bind_text(statement2, 2, [artist UTF8String], -1, NULL) != SQLITE_OK) {
+					NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
 
-						}
+			} else {
+				NSString* likeStmt = [NSString stringWithFormat:@"SELECT liked_state, item_stats.item_pid, liked_state_changed \n"
+					"FROM item_stats \n"
+					"INNER JOIN item_extra ON item_extra.item_pid = item_stats.item_pid \n"
+					"INNER JOIN item ON item.item_pid = item_stats.item_pid \n"
+					"WHERE item_extra.title = ? AND item.item_artist_pid = %lld", albumArtistPID];
 
-						int stepResult = sqlite3_step(statement2);
+				const char *likeStmtStr = [likeStmt UTF8String]; //"SELECT item_pid, liked_state, liked_state_changed FROM item_stats WHERE item_pid = ";
+
+				NSLog(@"preparing statement: %@!", likeStmt);
+				if (sqlite3_prepare_v2(db, likeStmtStr, -1, &statement2, NULL) != SQLITE_OK) {
+					NSLog(@"Failed to prepare like stmt: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
+
+				if (sqlite3_bind_text(statement2, 1, [title UTF8String], -1, NULL) != SQLITE_OK) {
+					NSLog(@"Failed to bind item_extra: %s", sqlite3_errmsg(db));
+					sqlite3_close(db);
+					return 0;
+				}
+
+			}
+
+			int stepResult = sqlite3_step(statement2);
             if (stepResult == SQLITE_ROW ) {
                 int likedState = sqlite3_column_int(statement2, 0);
-								// int64_t pid2 = sqlite3_column_int64(statement2, 1);
-								// log([NSString stringWithFormat:@"%@ (%lld) liked state: %d", title, pid2, likedState]);
-								NSString* state = @"default";
-								if(likedState == 2) {
-									state = @"liked";
-								}
-								if(likedState == 3) {
-									state = @"disliked";
-								}
-								// log([NSString stringWithFormat:@"%@ / %@ / %@ state = %@", title, subtitle, artist, state]);
-								sqlite3_finalize(statement2);
-		            sqlite3_close(db);
-								return likedState;
-								//alert([NSString stringWithFormat:@"%@ state", title], state);
+				// int64_t pid2 = sqlite3_column_int64(statement2, 1);
+				// log([NSString stringWithFormat:@"%@ (%lld) liked state: %d", title, pid2, likedState]);
+				NSString* state = @"default";
+				if(likedState == 2) {
+					state = @"liked";
+				}
+				if(likedState == 3) {
+					state = @"disliked";
+				}
+				// log([NSString stringWithFormat:@"%@ / %@ / %@ state = %@", title, subtitle, artist, state]);
+				sqlite3_finalize(statement2);
+				sqlite3_close(db);
+				return likedState;
+				//alert([NSString stringWithFormat:@"%@ state", title], state);
             } else {
-							NSLog(@"<Error> Failed to step item_stats query (result = %d)!", stepResult);
-						}
+				NSLog(@"<Error> findLikedStateRaw Failed to step item_stats query (result = %d)!", stepResult);
+			}
 
-						sqlite3_finalize(statement2);
+			sqlite3_finalize(statement2);
             sqlite3_close(db);
         } else {
-						NSLog(@"Failed to open db");
+			NSLog(@"Failed to open db");
         }
-    }else{
+    } else {
 			NSLog(@"DB does not exist");
         // NSLog(@"database is not exist.");
     }
@@ -466,7 +466,7 @@ int toggleLikedState(NSString* title, NSString* artist) {
 								return newState;
 								//alert([NSString stringWithFormat:@"%@ state", title], state);
             } else {
-							NSLog(@"<Error> Failed to step item_stats query (result = %d)!", stepResult);
+							NSLog(@"<Error> ToggleLikedState Failed to step item_stats query (result = %d)!", stepResult);
 						}
 
 						sqlite3_finalize(statement2);
@@ -647,7 +647,7 @@ int findStarRating(NSString* title, NSString* artist, NSString* album) {
 								return userRating;
 								//alert([NSString stringWithFormat:@"%@ state", title], state);
             } else {
-							NSLog(@"<Error> Failed to step item_stats query (result = %d)!", stepResult);
+							NSLog(@"<Error> findStarRating Failed to step item_stats query (result = %d)!", stepResult);
 						}
 
 						sqlite3_finalize(statement2);

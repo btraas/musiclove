@@ -83,22 +83,22 @@
 				<key>icon</key>
 				<string>paypal.png</string>
     </dict>
-		<dict>
-			<key>cell</key>
-				<string>PSSwitchCell</string>
-			<key>default</key>
-				<false/>
-			<key>defaults</key>
-				<string>ca.btraas.musiclove</string>
-			<key>key</key>
-				<string>show-song-disliked-disabled</string>
-			<key>label</key>
-				<string>Show dislikes</string>
-			<key>enabled</key>
-				<false/>
-			<key>icon</key>
-				<string>/Library/Application Support/ca.btraas.musiclove.bundle/dislike@2x.png</string>
-		</dict>
+<!--		<dict>-->
+<!--			<key>cell</key>-->
+<!--				<string>PSSwitchCell</string>-->
+<!--			<key>default</key>-->
+<!--				<false/>-->
+<!--			<key>defaults</key>-->
+<!--				<string>ca.btraas.musiclove</string>-->
+<!--			<key>key</key>-->
+<!--				<string>show-song-disliked-disabled</string>-->
+<!--			<key>label</key>-->
+<!--				<string>Show dislikes</string>-->
+<!--			<key>enabled</key>-->
+<!--				<false/>-->
+<!--			<key>icon</key>-->
+<!--				<string>/Library/Application Support/ca.btraas.musiclove.bundle/dislike@2x.png</string>-->
+<!--		</dict>-->
 
 		<dict>
 			<key>cell</key>
@@ -121,7 +121,8 @@
 			<key>enabled</key>
 				<false/>
 		</dict>
-		<dict>
+
+		<!--<dict>
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>cellClass</key>
@@ -135,13 +136,14 @@
 				<key>fallback</key>
 				<string>#909090</string>
 				<key>alpha</key>
-				<true/> <!-- <true/> or <false/> Show alpha slider -->
+				<true/>
 			</dict>
 			<key>label</key>
 			<string>Dislike heart color</string>
 			<key>enabled</key>
 				<false/>
-		</dict>
+		</dict>-->
+
 
 		<dict>
 			<key>cell</key>
@@ -160,20 +162,7 @@
 				<false/>
 		</dict>
 
-		<dict>
-			<key>cell</key>
-				<string>PSSwitchCell</string>
-			<key>default</key>
-				<false/>
-			<key>defaults</key>
-				<string>ca.btraas.musiclove</string>
-			<key>key</key>
-				<string>double-tap-like</string>
-			<key>label</key>
-				<string>Double-tap to like (beta)</string>
-			<key>enabled</key>
-				<false/>
-		</dict>
+
 
 
 		<!-- Donations -->
@@ -205,6 +194,6 @@
 
 	</array>
 	<key>title</key>
-	<string>MusicLove</string>
+	<string>MusicLove (iOS 13)</string>
 </dict>
 </plist>

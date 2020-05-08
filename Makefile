@@ -1,7 +1,11 @@
-#FINALPACKAGE=1
+FINALPACKAGE=0
 DEBUG=1
 
 PACKAGE_VERSION=$(THEOS_PACKAGE_BASE_VERSION)
+
+# TARGET = iphone:clang:latest:13.0
+
+
 
 include $(THEOS)/makefiles/common.mk
 
@@ -20,6 +24,8 @@ ca.btraas.musiclove_PRIVATE_FRAMEWORKS = HomeSharing MusicLibrary
 
 include $(THEOS)/makefiles/bundle.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
+
+INSTALL_TARGET_PROCESSES = Music
 
 after-install::
 	install.exec "killall -9 Music" || echo "Music was not running." && printf "\nEnjoy MusicLove ~\n" # && install.exec "killall -9 SpringBoard"

@@ -7,6 +7,7 @@ the generation of a class list and an automatic constructor.
 */
 
 // #define Debugger
+
 // #define DEBUG 0
 
 #import "sqlite3.h"
@@ -31,6 +32,7 @@ the generation of a class list and an automatic constructor.
 static NSObject* controller;
 
 NSMutableDictionary *cellMap;
+
 
 
 
@@ -307,6 +309,11 @@ NSMutableDictionary *cellMap;
 -(void)layoutSubviews {
 	%orig;
 
+//    NSLog(@"MusicContainerDetailHeaderLockupView:layoutSubviews");
+//    logSubviews(self);
+
+
+
 	//vcAlbum = getProperty(self, @"titleText");
 	//NSLog(@"MusicContainerDetailHeaderLockupView properties:");
 	//logProperties(self);
@@ -318,7 +325,8 @@ NSMutableDictionary *cellMap;
 	if(IDIOM == IPAD) {
 		artistTitleButton = (UIButton*)findWithOrigin(self, @"UIButton", -66,35);
 	} else {
-		artistTitleButton = (UIButton*)findWithOrigin(self, @"UIButton", 107.5, 13.5);
+	    artistTitleButton = (UIButton*)find(self, @"UIButton"); // will likely break in a future iOS version...
+		// iOS < 13... artistTitleButton = (UIButton*)findWithOrigin(self, @"UIButton", 107.5, 13.5);
 	}
 
 	if(artistTitleButton != nil) {
@@ -618,9 +626,8 @@ static HSCloudClient* cloudClient;
 - (void)viewWillAppear:(BOOL)fp8 {
     %orig;
 
-		NSLog(@"%@:: viewWillAppear (dbg)", NSStringFromClass([self class]));
-		logProperties(self);
 
+//
 //        if([NSStringFromClass([self class]) isEqualToString:@"MusicApplication.AlbumDetailSongsViewController"]) {
 //            NSLog(@"MusicApplication.AlbumDetailSongsViewController!");
 //            if(![self view]) {
@@ -633,17 +640,23 @@ static HSCloudClient* cloudClient;
 //                NSLog(@"Failed to find MusicApplication.ContainerDetailHeaderLockupView in this view!");
 //            }
 //
-////            NSLog(@"Header views: ");
-////            logSubviews(header);
+//            NSLog(@"All views:");
+//            logSubviews([self view]);
 //
-//            UIButton* btn = (UIButton *)find(header, @"UIButton");
+//            NSLog(@"Header views: ");
+//            logSubviews(header);
+//
+//            UIButton* btn = (UIButton *)find([self view], @"UIButton");
 //            if(!btn) {
-//                NSLog(@"Failed to find UIButton in this HeaderLockupView!");
+//                NSLog(@"Failed to find a UIButton in this %@!", NSStringFromClass([[self view] class]));
+//            } else {
+//                vcArtist = [btn currentTitle];
+//                NSLog(@"MusicApplication.AlbumDetailSongsViewController found artist: %@", vcArtist);
 //            }
 //
-//            vcArtist = [btn currentTitle];
-//            NSLog(@"MusicApplication.AlbumDetailSongsViewController found artist: %@", vcArtist);
-//        } else {
+//
+//        }
+//        else {
 //            UIView* header = find([self view], @"MusicApplication.ContainerDetailHeaderLockupView");
 //            if(!header) {
 //                NSLog(@"Failed to find MusicApplication.ContainerDetailHeaderLockupView in this view!");
@@ -663,7 +676,7 @@ static HSCloudClient* cloudClient;
 //
 //        }
 
-		if(!likeDictInit) {
+    if(!likeDictInit) {
         likeDict = [NSMutableDictionary new];
         likeDictInit = YES;
     }
@@ -694,6 +707,8 @@ static HSCloudClient* cloudClient;
 	NSLog(@"BrowseCollectionViewController:: viewDidLoad");
 }
 %end
+
+
 
 %ctor {
 	// MusicTextDrawingView = objc_getClass("_TtCVV5Music4Text7Drawing4View"),

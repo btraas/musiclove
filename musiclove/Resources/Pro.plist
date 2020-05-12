@@ -76,7 +76,7 @@
 		</dict>
 
 
-		<!--<dict>
+		<dict>
 			<key>cell</key>
 				<string>PSSwitchCell</string>
 			<key>default</key>
@@ -89,7 +89,7 @@
 				<string>Show dislikes</string>
 			<key>icon</key>
 				<string>/Library/Application Support/ca.btraas.musiclove.bundle/dislike@2x.png</string>
-		</dict>-->
+		</dict>
 
 
 		<dict>
@@ -112,7 +112,7 @@
 			<string>Like heart color</string>
 		</dict>
 
-		<!--<dict>
+		<dict>
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>cellClass</key>
@@ -130,9 +130,9 @@
 			</dict>
 			<key>label</key>
 			<string>Dislike heart color</string>
-		</dict>-->
+		</dict>
 
-		<!-- <dict>
+		<!--<dict>
 			<key>cell</key>
 				<string>PSSwitchCell</string>
 			<key>default</key>
@@ -145,7 +145,7 @@
 				<string>Double-tap to like (beta)</string>
 			<key>enabled</key>
 				<true/>
-		</dict> -->
+		</dict>-->
 
 		<dict>
 			<key>cell</key>
@@ -200,6 +200,6 @@
 
 	</array>
 	<key>title</key>
-	<string>MusicLove (iOS 13)</string>
+	<string>MusicLove</string>
 </dict>
 </plist>

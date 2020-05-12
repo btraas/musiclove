@@ -25,13 +25,14 @@ NSString* getArtistName(NSObject* _orig) {
 NSString* findSongCellArtist(UIView* songCell) {
 	UIScrollView* collectionView = ((UIScrollView *)closest(songCell, @"UICollectionView"));
 
-	/** iOS < 13
-	 *
-//	// UIViewControllerWrapperView is iPad, _UIParallaxDimmingView is iPhone
-//	if(songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView")
-//	|| isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
-//		return getArtistName(songCell);
-	 */
+
+    float ver = [[[UIDevice currentDevice] systemVersion] floatValue];
+
+    // iOS < 13
+    if(ver < 13.0 && songCell && (collectionView == NULL || isClass([[collectionView superview] superview], @"UIViewControllerWrapperView")
+                    || isClass([[collectionView superview] superview], @"_UIParallaxDimmingView"))) {
+        return getArtistName(songCell);
+    }
 
 	if(getArtistName(songCell)) {
 	    return getArtistName(songCell);
@@ -43,7 +44,8 @@ NSString* findSongCellArtist(UIView* songCell) {
 
 		// VerticalScrollStackScrollView is for the artist only. "getArtistName() will get the album name instead..."
 	} else if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView")
-	|| isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
+              || isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView")
+              || isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
 		return vcArtist;
 	}
 	return nil;
@@ -67,7 +69,8 @@ void updateMusicLoveWithLikeState(UIView* songCell, NSString* title, int likeSta
 	UIScrollView* collectionView = ((UIScrollView *)closest(songCell, @"UICollectionView"));
 
 	// one is iPad, one is iPhone
-	if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView")
+	if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView") // iOS 13
+    || isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView")
 	|| isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
 		drawLike(songCell, title, likeState, 3, 7, NO, secondaryBackground);
 	} else {
@@ -89,7 +92,8 @@ void updateMusicLoveWithRating(UIView* songCell, NSString* title, int rating, in
 	}
 
 	// one is iPad, one is iPhone
-	if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView")
+	if(isClass([[collectionView superview] superview], @"MusicApplication.VerticalScrollStackScrollView") // iOS 13
+    || isClass([[collectionView superview] superview], @"Music.VerticalScrollStackScrollView") // iOS < 13
 	|| isClass([[collectionView superview] superview], @"_TtC5MusicP33_5364BCBBBF924B0F2B3BC61F02267B0216SplitDisplayView")) {
 
 		drawRating(songCell, title, rating, likeState, -1, paddingTop, NO, secondaryBackground);

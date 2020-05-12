@@ -812,7 +812,15 @@ void drawLike(UIView* _orig, NSString* title, int likeState, double paddingLeft,
 
 		UIColor* rootColor;
 
-		UIView* sBackground = find([_orig superview], @"MusicApplication.NowPlayingCollectionViewSecondaryBackground");
+        float ver = [[[UIDevice currentDevice] systemVersion] floatValue];
+
+        UIView* sBackground;
+        if(ver >= 13.0) {
+            sBackground = find([_orig superview], @"MusicApplication.NowPlayingCollectionViewSecondaryBackground");
+        } else {
+            sBackground	= find([_orig superview], @"Music.NowPlayingCollectionViewSecondaryBackground");
+        }
+
 		if(sBackground) {
 			rootColor = [sBackground backgroundColor];
 		} else {
@@ -1021,7 +1029,16 @@ void drawRating(UIView* _orig, NSString* title, int rating, int likeState, doubl
 
 		UIColor* rootColor;
 
-		UIView* sBackground = find([_orig superview], @"MusicApplication.NowPlayingCollectionViewSecondaryBackground");
+        float ver = [[[UIDevice currentDevice] systemVersion] floatValue];
+
+        UIView* sBackground;
+
+        if(ver >= 13.0) {
+            sBackground = find([_orig superview], @"MusicApplication.NowPlayingCollectionViewSecondaryBackground");
+        } else {
+            sBackground = find([_orig superview], @"Music.NowPlayingCollectionViewSecondaryBackground");
+        }
+
 		if(sBackground) {
 			rootColor = [sBackground backgroundColor];
 		} else {

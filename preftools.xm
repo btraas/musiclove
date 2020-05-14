@@ -1,4 +1,4 @@
-#include "MusicLove.h"
+#import "MusicLove.h"
 #define APPLE_MUSIC_TINT_COLOR_STRING @"#ff2d55"
 
 

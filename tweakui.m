@@ -1,4 +1,5 @@
 #import "UIKit/UIKit.h"
+#import "MusicLove.h"
 
 NSString* vcArtist = @"";
 NSString* vcAlbum = @"";
@@ -109,7 +110,7 @@ void updateMusicLoveWithRating(UIView* songCell, NSString* title, int rating, in
 
 
 
-void updateMusicLoveUI(UIView* songCell) {
+int updateMusicLoveUI(UIView* songCell) {
 
 	// UIView* songCell = self;
 
@@ -117,7 +118,7 @@ void updateMusicLoveUI(UIView* songCell) {
 
   if(!songCell) {
 		NSLog(@"songCell empty!");
-		return;
+		return -1;
 	}
 
 
@@ -140,7 +141,7 @@ void updateMusicLoveUI(UIView* songCell) {
 
 	if(title == nil || artist == nil || [artist length] == 0 || !artist) {
 		NSLog(@"title/artist empty!");
-		return;
+		return -1;
 	}
 
   setViewTag(songCell, title);
@@ -150,6 +151,9 @@ void updateMusicLoveUI(UIView* songCell) {
 		NSLog(@" Finding %@ _TtCVV5Music4Text7Drawing4View...", title);
 		// UIView* star = find( songCell, @"_TtCVV5Music4Text7Drawing4View");
 		UIView* star = findWithOrigin( songCell, @"_TtCVV5Music4Text7Drawing4View", 0, -10.5);
+		if(!star) {
+            star = findWithOrigin( songCell, @"_TtCVV5MusicApplication4Text7Drawing4View", 0, -10.5);
+        }
 
 		if(star && star != nil) {
 			NSLog(@" Found _TtCVV5Music4Text7Drawing4View at 0,-10.5 !!");
@@ -217,9 +221,11 @@ void updateMusicLoveUI(UIView* songCell) {
 				}
 			//}
 
+			return -1;
+
 		} else {
 
-			UIView* like = findWithSize( songCell, @"UIImageView", 17, 17);
+			UIView* like = findWithSize( songCell, @"UIImageView", HEART_HEIGHT, HEART_WIDTH);
 			UIView* dislike = findWithSize( songCell, @"UIImageView", 15 ,16);
 
 
@@ -248,11 +254,11 @@ void updateMusicLoveUI(UIView* songCell) {
 
 			if(like && likeState == 2) {
 				NSLog(@"Already displayed like for %@!", combined);
-				return;
+				return 2;
 			}
 			if(dislike && likeState == 3) {
 				NSLog(@"Already displayed dislike for %@!", combined);
-				return;
+				return 3;
 			}
 
 
@@ -282,6 +288,7 @@ void updateMusicLoveUI(UIView* songCell) {
 					NSLog(@"%@ likeState (from artist): title changed! (from %@ to %@)", title, title, newTitle);
 				}
 			// }
+			return likeState;
 		}
 //	}
 
@@ -297,6 +304,7 @@ void updateMusicLoveUI(UIView* songCell) {
 	// 	NSLog(@"%@ likeState (from artist): title changed! (from %@ to %@)", title, title, newTitle);
 	//
 	// }
+	return 0;
 }
 
 NSTimer* tapTimer = nil;

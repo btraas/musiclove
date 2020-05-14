@@ -11,18 +11,18 @@ the generation of a class list and an automatic constructor.
 // #define DEBUG 0
 
 #import "sqlite3.h"
-#include <objc/runtime.h>
+#import <objc/runtime.h>
 #import "UIKit/UIKit.h"
-#include "MusicLove.h"
+#import "MusicLove.h"
 
 #define resourceBundle @"/Library/Application Support/ca.btraas.musiclove.bundle"
 
 
-#include "common.m" // functions like nlog() and getProperty()
-#include "preftools.xm"
-#include "musictools.xm" // DB functions like getArtistPID()
+#import "common.m" // functions like nlog() and getProperty()
+#import "preftools.xm"
+#import "musictools.xm" // DB functions like getArtistPID()
 // #include "tweakui.h"
-#include "tweakui.m" // functions like updateMusicLoveUI()
+#import "tweakui.m" // functions like updateMusicLoveUI()
 
 // iTunes_Control/iTunes/MediaLibrary.sqlitedb -> item_stats.liked_state
 //  (2 = liked, 3 = disliked)
@@ -713,6 +713,58 @@ static HSCloudClient* cloudClient;
 }
 %end
 
+%hook MusicTextDrawingView
+
+-(void)drawRect:(CGRect)arg1 {
+
+    UIView* _self = (UIView*)self;
+//    UIView* _superview = [(UIView*)self superview];
+//    NSString* _superType = NSStringFromClass([_superview class]);
+
+//    if(_self.frame.origin.y == -10.5) {
+//        NSLog(@"origin y == -10.5!!");
+//    }
+
+    BOOL hideStar = ratingEnabled() || !starEnabled();
+
+    if(!hideStar && heartEnabled()) {
+        UIView* _songCell = closest(_self, @"MusicApplication.SongCell");
+        if(!_songCell) {
+            _songCell = closest(_self, @"Music.SongCell");
+        }
+        if(_songCell) {
+            int likeState = updateMusicLoveUI(_songCell);
+            NSLog(@"drawRect: loaded likeState=%d", likeState);
+            if(likeState > 0) {
+                hideStar = YES;
+            }
+        }
+    }
+
+
+
+    if(hideStar && _self.frame.origin.y == -10.5){
+        NSLog(@"origin y == -10.5!! Hiding self");
+        ((UIView*)self).hidden = YES;
+    }
+
+    NSLog(@"Init MusicTextDrawingView:: arg origin.y: %f", arg1.origin.y);
+//    NSLog(@"Init MusicTextDrawingView:: arg width: %d", arg1.width);
+
+    %orig;
+
+    if(hideStar && _self.frame.origin.y == -10.5
+       // ([_superType isEqualToString:@"_TtCV15MusicApplication4Text9StackView"] || [_superType isEqualToString:@"_TtCV15Music4Text9StackView"])
+    ){
+        NSLog(@"origin y == -10.5!! Hiding self");
+        ((UIView*)self).hidden = YES;
+    }
+
+    NSLog(@"Init MusicTextDrawingView:: self origin.y: %f", _self.frame.origin.y);
+//    NSLog(@"Init MusicTextDrawingView:: arg width: %d", self.frame.width);
+}
+
+%end
 
 
 %ctor {
@@ -733,7 +785,8 @@ static HSCloudClient* cloudClient;
                 MusicContainerDetailHeaderLockupView = ver >= 13.0 ? objc_getClass("MusicApplication.ContainerDetailHeaderLockupView") : objc_getClass("Music.ContainerDetailHeaderLockupView"),
                 MusicSongsViewController =  ver >= 13.0 ? objc_getClass("MusicApplication.SongsViewController") : objc_getClass("Music.SongsViewController"),
                 MusicTintColorObservingView = ver >= 13.0 ? objc_getClass("MusicApplication.TintColorObservingView") : objc_getClass("Music.TintColorObservingView"),
-                BrowseCollectionViewController = objc_getClass("_TtGC5Music30BrowseCollectionViewController"),
+                BrowseCollectionViewController = ver >= 13.0 ? objc_getClass("_TtGC5MusicApplication30BrowseCollectionViewController") : objc_getClass("_TtGC5Music30BrowseCollectionViewController"), // check this...
+                MusicTextDrawingView = ver >= 13.0 ? objc_getClass("_TtCVV16MusicApplication4Text7Drawing4View") : objc_getClass("_TtCVV16Music4Text7Drawing4View"), // untested on iOS < 13... This is the star view
                 CompositeCollectionViewController = ver >= 13.0 ? objc_getClass("MusicApplication.CompositeCollectionViewController") : objc_getClass("Music.CompositeCollectionViewController"));
 //    } else {
         // don't have a space after %init(

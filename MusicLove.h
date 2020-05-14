@@ -7,6 +7,9 @@
 
 #define kPrefsPlistPath @"/var/mobile/Library/Preferences/ca.btraas.musiclove.plist"
 
+extern const int HEART_WIDTH = 14;
+extern const int HEART_HEIGHT = 14;
+
 #define kNoctisAppID 			CFSTR("com.laughingquoll.noctis")
 #define kNoctisEnabledKey 		CFSTR("LQDDarkModeEnabled")
 

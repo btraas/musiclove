@@ -4,8 +4,9 @@ GO_EASY_ON_ME=1
 
 PACKAGE_VERSION=$(THEOS_PACKAGE_BASE_VERSION)
 
-ARCHS = arm64 arm64e
-TARGET = iphone:clang:11.2
+# ARCHS = arm64 arm64e
+# TARGET = iphone:clang:11.2 for release...
+
 # SYSROOT = $(THEOS)/sdks/iPhoneOS9.3.sdk
 
 include $(THEOS)/makefiles/common.mk

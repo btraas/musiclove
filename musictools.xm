@@ -794,15 +794,15 @@ void drawLike(UIView* _orig, NSString* title, int likeState, double paddingLeft,
 		}
 
 
-		float width = 17;
-		int height = 17;
-		if(likeState == 3) {
-			// if(IDIOM != IPAD)  {
-			// 	paddingLeft = 4.5;
-			// }
-			width = 15;
-			height = 16;
-		}
+		float width = HEART_WIDTH;
+		int height = HEART_HEIGHT;
+		// if(likeState == 3) { // dislike
+		// 	// if(IDIOM != IPAD)  {
+		// 	// 	paddingLeft = 4.5;
+		// 	// }
+		// 	width = 15;
+		// 	height = 16;
+		// }
 		CGRect frame = CGRectMake(paddingLeft, paddingTop, width, height);
 
 		NSLog(@"getting color: ");

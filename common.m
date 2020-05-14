@@ -1,6 +1,6 @@
-#include <CommonCrypto/CommonDigest.h>
-#include "MusicLove.h"
-#include <objc/runtime.h>
+#import <CommonCrypto/CommonDigest.h>
+#import "MusicLove.h"
+#import <objc/runtime.h>
 
 
 #define NLOG false

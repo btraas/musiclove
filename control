@@ -1,7 +1,7 @@
 Package: ca.btraas.musiclove
 Name: MusicLove
 Depends: mobilesubstrate, org.thebigboss.libcolorpicker (>= 1.6.6), preferenceloader (>= 2.2)
-Version: 0.4.4
+Version: 0.4.5
 Architecture: iphoneos-arm
 Description: Adds a heart indicator for songs you've "loved"
 Maintainer: Brayden Traas <btraas@gmail.com>

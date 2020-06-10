@@ -134,8 +134,11 @@ int updateMusicLoveUI(UIView* songCell) {
 	    artist = findSongCellArtist(songCell);
 	}
 
-	if(artist == nil || [artist length] == 0 || artist == NULL || [artist length] < 2) {
+	if(!artist || artist == nil || [artist length] == 0 || artist == NULL || [artist length] < 2) {
 		artist = vcArtist;
+	}
+	if(!artist || !title) {
+		return -1;
 	}
 	NSString* combined = [NSString stringWithFormat:@"%@ _by_ %@", title, artist];
 
